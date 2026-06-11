@@ -6,6 +6,8 @@ const EditBlog = () => {
   const { id } = useParams();
   const navigate = useNavigate();
 
+  const [uploading, setUploading] = useState(false);
+
   const [formData, setFormData] = useState({
     title: "",
     content: "",
@@ -37,6 +39,38 @@ const EditBlog = () => {
       });
     } catch (error) {
       console.log(error);
+    }
+  };
+
+  const handleImageUpload = async (
+    e: React.ChangeEvent<HTMLInputElement>
+  ) => {
+    const file = e.target.files?.[0];
+
+    if (!file) return;
+
+    const uploadData = new FormData();
+    uploadData.append("image", file);
+
+    try {
+      setUploading(true);
+
+      const res = await axios.post(
+        "http://localhost:5000/api/upload/image",
+        uploadData
+      );
+
+      setFormData((prev) => ({
+        ...prev,
+        image: res.data.imageUrl,
+      }));
+
+      alert("Image Uploaded Successfully");
+    } catch (error) {
+      console.log(error);
+      alert("Image Upload Failed");
+    } finally {
+      setUploading(false);
     }
   };
 
@@ -83,18 +117,26 @@ const EditBlog = () => {
           required
         />
 
-        <input
-          type="text"
-          placeholder="Image URL"
-          value={formData.image}
-          onChange={(e) =>
-            setFormData({
-              ...formData,
-              image: e.target.value,
-            })
-          }
-          className="w-full p-4 mb-4 rounded-xl bg-slate-800 text-white border border-slate-700"
-        />
+        {/* IMAGE UPLOAD */}
+
+        <div className="mb-4">
+          <label className="block text-white mb-2">
+            Upload New Image
+          </label>
+
+          <input
+            type="file"
+            accept="image/*"
+            onChange={handleImageUpload}
+            className="w-full p-4 rounded-xl bg-slate-800 text-white border border-slate-700"
+          />
+
+          {uploading && (
+            <p className="mt-2 text-purple-400">
+              Uploading image...
+            </p>
+          )}
+        </div>
 
         <select
           value={formData.backgroundColor}
@@ -130,7 +172,7 @@ const EditBlog = () => {
           <option value="#FDE68A">Luxury Gold</option>
         </select>
 
-        {/* Live Preview */}
+        {/* LIVE PREVIEW */}
 
         <div
           className="rounded-3xl p-6 mb-6 border border-slate-700 shadow-xl"
@@ -141,11 +183,11 @@ const EditBlog = () => {
           }}
         >
           {formData.image && (
-            <div className="rounded-2xl overflow-hidden mb-4 border border-purple-500 shadow-[0_0_25px_rgba(168,85,247,0.6)] hover:shadow-[0_0_45px_rgba(168,85,247,1)] transition duration-500">
+            <div className="rounded-2xl overflow-hidden mb-4 border border-purple-500 shadow-[0_0_25px_rgba(168,85,247,0.6)]">
               <img
                 src={formData.image}
                 alt="Preview"
-                className="w-full object-contain hover:scale-105 transition duration-500"
+                className="w-full object-contain"
               />
             </div>
           )}
@@ -176,9 +218,12 @@ const EditBlog = () => {
 
         <button
           type="submit"
-          className="mt-6 bg-gradient-to-r from-purple-600 to-blue-600 hover:from-purple-700 hover:to-blue-700 px-8 py-3 rounded-xl font-semibold text-white transition"
+          disabled={uploading}
+          className="mt-6 bg-gradient-to-r from-purple-600 to-blue-600 hover:from-purple-700 hover:to-blue-700 px-8 py-3 rounded-xl font-semibold text-white transition disabled:opacity-50"
         >
-          Update Blog
+          {uploading
+            ? "Uploading..."
+            : "Update Blog"}
         </button>
       </form>
     </div>

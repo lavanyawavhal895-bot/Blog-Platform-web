@@ -20,7 +20,9 @@ const Navbar = () => {
           Dashboard
         </Link>
 
-       
+       <Link to="/my-blogs">
+  My Blogs
+</Link>
 
         <button
           onClick={logout}

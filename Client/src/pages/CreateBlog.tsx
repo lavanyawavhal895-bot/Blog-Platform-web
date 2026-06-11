@@ -5,12 +5,48 @@ const CreateBlog = () => {
   const [title, setTitle] = useState("");
   const [content, setContent] = useState("");
   const [image, setImage] = useState("");
+  const [uploading, setUploading] = useState(false);
 
   const [backgroundColor, setBackgroundColor] =
     useState("#0B0B0B");
 
   const [textColor, setTextColor] =
     useState("#FFFFFF");
+
+  const handleImageUpload = async (
+    e: React.ChangeEvent<HTMLInputElement>
+  ) => {
+    const file = e.target.files?.[0];
+
+    if (!file) return;
+
+    setUploading(true);
+
+    const formData = new FormData();
+    formData.append("image", file);
+
+    try {
+      const res = await axios.post(
+        "http://localhost:5000/api/upload/image",
+        formData,
+        {
+          headers: {
+            "Content-Type":
+              "multipart/form-data",
+          },
+        }
+      );
+
+      setImage(res.data.imageUrl);
+
+      alert("Image Uploaded Successfully");
+    } catch (error) {
+      console.log(error);
+      alert("Image Upload Failed");
+    } finally {
+      setUploading(false);
+    }
+  };
 
   const handleSubmit = async (
     e: React.FormEvent
@@ -61,6 +97,7 @@ const CreateBlog = () => {
         onSubmit={handleSubmit}
         className="space-y-5"
       >
+        {/* Title */}
         <input
           type="text"
           placeholder="Blog Title"
@@ -72,20 +109,33 @@ const CreateBlog = () => {
           required
         />
 
-        <input
-          type="text"
-          placeholder="Image URL"
-          value={image}
-          onChange={(e) =>
-            setImage(e.target.value)
-          }
-          className="w-full p-4 rounded-xl bg-slate-900 border border-slate-700 outline-none"
-        />
+        {/* Image Upload */}
+        <div>
+          <label className="block mb-2 font-medium">
+            Upload Image
+          </label>
 
+          <input
+            type="file"
+            accept="image/*"
+            onChange={handleImageUpload}
+            className="w-full p-4 rounded-xl bg-slate-900 border border-slate-700"
+          />
+
+          {uploading && (
+            <p className="mt-2 text-purple-400">
+              Uploading image...
+            </p>
+          )}
+        </div>
+
+        {/* Background Color */}
         <select
           value={backgroundColor}
           onChange={(e) =>
-            setBackgroundColor(e.target.value)
+            setBackgroundColor(
+              e.target.value
+            )
           }
           className="w-full p-4 rounded-xl bg-slate-900 border border-slate-700"
         >
@@ -109,6 +159,7 @@ const CreateBlog = () => {
           </option>
         </select>
 
+        {/* Text Color */}
         <select
           value={textColor}
           onChange={(e) =>
@@ -130,6 +181,7 @@ const CreateBlog = () => {
           </option>
         </select>
 
+        {/* Content */}
         <textarea
           placeholder="Blog Content"
           value={content}
@@ -142,7 +194,6 @@ const CreateBlog = () => {
         />
 
         {/* Preview */}
-
         <div
           className="rounded-3xl p-6 border border-slate-700 shadow-2xl"
           style={{
@@ -151,11 +202,11 @@ const CreateBlog = () => {
           }}
         >
           {image && (
-            <div className="rounded-2xl overflow-hidden mb-4 border border-purple-500 shadow-[0_0_25px_rgba(168,85,247,0.6)] hover:shadow-[0_0_45px_rgba(168,85,247,1)] transition duration-500">
+            <div className="rounded-2xl overflow-hidden mb-4 border border-purple-500 shadow-[0_0_25px_rgba(168,85,247,0.6)]">
               <img
                 src={image}
                 alt="Preview"
-                className="w-full object-contain hover:scale-105 transition duration-500"
+                className="w-full object-contain"
               />
             </div>
           )}
@@ -171,11 +222,15 @@ const CreateBlog = () => {
           </p>
         </div>
 
+        {/* Submit */}
         <button
           type="submit"
-          className="bg-gradient-to-r from-purple-600 to-blue-600 hover:from-purple-700 hover:to-blue-700 px-8 py-3 rounded-xl font-semibold transition"
+          disabled={uploading}
+          className="bg-gradient-to-r from-purple-600 to-blue-600 hover:from-purple-700 hover:to-blue-700 px-8 py-3 rounded-xl font-semibold transition disabled:opacity-50"
         >
-          Publish Blog
+          {uploading
+            ? "Uploading..."
+            : "Publish Blog"}
         </button>
       </form>
     </div>

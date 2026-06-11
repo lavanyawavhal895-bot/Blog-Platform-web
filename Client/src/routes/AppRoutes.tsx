@@ -6,6 +6,7 @@ import Dashboard from "../pages/Dashboard";
 import CreateBlog from "../pages/CreateBlog";
 import EditBlog from "../pages/EditBlog";
 import BlogDetails from "../pages/BlogDetails";
+import MyBlogs from "../pages/MyBlogs";
 
 import ProtectedRoute from "../components/ProtectedRoute";
 
@@ -26,10 +27,12 @@ const AppRoutes = () => {
           </ProtectedRoute>
         }
       />
-<Route
-  path="/blog/:id"
-  element={<BlogDetails />}
-/>
+
+      <Route
+        path="/blog/:id"
+        element={<BlogDetails />}
+      />
+
       <Route
         path="/create-blog"
         element={
@@ -44,6 +47,15 @@ const AppRoutes = () => {
         element={
           <ProtectedRoute>
             <EditBlog />
+          </ProtectedRoute>
+        }
+      />
+
+      <Route
+        path="/my-blogs"
+        element={
+          <ProtectedRoute>
+            <MyBlogs />
           </ProtectedRoute>
         }
       />
