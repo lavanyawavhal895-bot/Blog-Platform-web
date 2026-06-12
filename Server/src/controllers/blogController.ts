@@ -5,6 +5,7 @@ import Blog from "../models/Blog";
 interface AuthenticatedRequest extends Request {
   user?: {
     id: string;
+    role: string; // Added role parameter type definition mapping
     [key: string]: any;
   };
 }
@@ -104,20 +105,24 @@ export const updateBlog = async (req: AuthenticatedRequest, res: Response) => {
       });
     }
 
-    // Owner check using authenticated user middleware context
-    if (!req.user || blog.author.toString() !== req.user.id) {
+    // Comprehensive Admin & Owner Bypass Check
+    const isOwner = req.user && blog.author.toString() === req.user.id;
+    const isAdmin = req.user && req.user.role === "admin";
+
+    if (!isOwner && !isAdmin) {
       return res.status(403).json({
-        message: "You can only edit your own blogs",
+        message: "You do not have permission to edit this blog",
       });
     }
 
-    // Assign properties safely from request payload body
+    // Assign properties safely, keeping old values if fields are missing in payload
     Object.assign(blog, {
-      title: req.body.title,
-      content: req.body.content,
-      image: req.body.image,
-      backgroundColor: req.body.backgroundColor,
-      textColor: req.body.textColor,
+      title: req.body.title !== undefined ? req.body.title : blog.title,
+      content: req.body.content !== undefined ? req.body.content : blog.content,
+      image: req.body.image !== undefined ? req.body.image : blog.image,
+      backgroundColor: req.body.backgroundColor !== undefined ? req.body.backgroundColor : blog.backgroundColor,
+      textColor: req.body.textColor !== undefined ? req.body.textColor : blog.textColor,
+      fontStyle: req.body.fontStyle !== undefined ? req.body.fontStyle : (blog as any).fontStyle,
     });
 
     await blog.save();
@@ -141,10 +146,13 @@ export const deleteBlog = async (req: AuthenticatedRequest, res: Response) => {
       });
     }
 
-    // Owner check using authenticated user middleware context
-    if (!req.user || blog.author.toString() !== req.user.id) {
+    // Comprehensive Admin & Owner Bypass Check
+    const isOwner = req.user && blog.author.toString() === req.user.id;
+    const isAdmin = req.user && req.user.role === "admin";
+
+    if (!isOwner && !isAdmin) {
       return res.status(403).json({
-        message: "You can only delete your own blogs",
+        message: "You do not have permission to delete this blog",
       });
     }
 

@@ -2,8 +2,11 @@ import { useEffect, useState, useRef } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import axios from "axios";
 import EmojiPicker, { Theme, EmojiClickData } from "emoji-picker-react";
-// Injected your design system WebGL Shader core component
 import { WebGLShader } from "../components/ui/WebGLShader";
+// Injected your newly crafted Premium UX UI Components
+import { Modal } from "../components/ui/Modal";
+import { ToastContainer } from "../components/ui/ToastContainer";
+import { ToastMessage } from "../components/ui/Toast";
 
 const EditBlog = () => {
   const { id } = useParams();
@@ -13,6 +16,10 @@ const EditBlog = () => {
   const [isTextDropdownOpen, setIsTextDropdownOpen] = useState(false);
   const [isEmojiPickerOpen, setIsEmojiPickerOpen] = useState(false);
   const [isFontDropdownOpen, setIsFontDropdownOpen] = useState(false);
+
+  // UX Polish State Matrices
+  const [toasts, setToasts] = useState<ToastMessage[]>([]);
+  const [isModalOpen, setIsModalOpen] = useState(false);
 
   const textDropdownRef = useRef<HTMLDivElement>(null);
   const emojiPickerRef = useRef<HTMLDivElement>(null);
@@ -44,6 +51,16 @@ const EditBlog = () => {
     { label: "Cormorant Traditional", value: "'Cormorant Garamond', serif" },
     { label: "Inter Sharp Black", value: "'Inter', sans-serif", weight: "700" },
   ];
+
+  // Toast dispatch utility abstraction handler
+  const addToast = (text: string, type: "success" | "error" | "info") => {
+    const id = Math.random().toString(36).substring(2, 9);
+    setToasts((prev) => [...prev, { id, text, type }]);
+  };
+
+  const removeToast = (id: string) => {
+    setToasts((prev) => prev.filter((toast) => toast.id !== id));
+  };
 
   useEffect(() => {
     if (id) {
@@ -79,6 +96,7 @@ const EditBlog = () => {
       });
     } catch (error) {
       console.log(error);
+      addToast("Failed to fetch initial blog record data data stream.", "error");
     }
   };
 
@@ -91,17 +109,24 @@ const EditBlog = () => {
 
     try {
       setUploading(true);
-      const res = await axios.post("http://localhost:5000/api/upload/image", uploadData);
+      const token = localStorage.getItem("token");
+      const config = {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      };
+
+      const res = await axios.post("http://localhost:5000/api/upload/image", uploadData, config);
 
       setFormData((prev) => ({
         ...prev,
         image: res.data.imageUrl,
       }));
 
-      alert("Image Uploaded Successfully");
+      addToast("Hero banner asset saved successfully", "success");
     } catch (error) {
       console.log(error);
-      alert("Image Upload Failed");
+      addToast("Image server storage handshake failure.", "error");
     } finally {
       setUploading(false);
     }
@@ -137,21 +162,42 @@ const EditBlog = () => {
     setIsFontDropdownOpen(false);
   };
 
-  const handleSubmit = async (e: React.FormEvent) => {
+  const handleFormSubmitClick = (e: React.FormEvent) => {
     e.preventDefault();
+    // Open verification confirmation modal window instead of triggering raw database alterations directly
+    setIsModalOpen(true);
+  };
 
+  const executeUpdatePayload = async () => {
+    setIsModalOpen(false);
     try {
-      await axios.put(`http://localhost:5000/api/blogs/${id}`, formData);
-      alert("Blog Updated Successfully");
-      navigate("/dashboard");
+      const token = localStorage.getItem("token");
+      const user = JSON.parse(localStorage.getItem("user") || "{}");
+
+      const config = {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      };
+
+      await axios.put(`http://localhost:5000/api/blogs/${id}`, formData, config);
+      
+      addToast("Blog documentation compilation saved successfully!", "success");
+      
+      setTimeout(() => {
+        if (user.role === "admin") {
+          navigate("/admin");
+        } else {
+          navigate("/dashboard");
+        }
+      }, 1000);
     } catch (error) {
       console.log(error);
-      alert("Update Failed");
+      addToast("System update transmission failure code 403/500.", "error");
     }
   };
 
   return (
-    // Fixed relative container node positioning block
     <div className="min-h-screen w-full relative bg-slate-950 flex items-center justify-center p-6 overflow-x-hidden">
       
       {/* Dynamic Interactive Background Mouse Canvas Instance */}
@@ -160,7 +206,7 @@ const EditBlog = () => {
       </div>
 
       <form
-        onSubmit={handleSubmit}
+        onSubmit={handleFormSubmitClick}
         className="bg-slate-900/80 backdrop-blur-xl p-8 rounded-3xl w-full max-w-3xl border border-slate-700/60 shadow-2xl relative z-10"
       >
         <h1 className="text-4xl text-white mb-8 font-bold">Edit Luxury Blog</h1>
@@ -253,7 +299,6 @@ const EditBlog = () => {
           </span>
           
           <div className="flex items-center gap-2">
-            {/* Custom 8-Font Style Selection Dropdown */}
             <div className="relative" ref={fontDropdownRef}>
               <button
                 type="button"
@@ -286,7 +331,6 @@ const EditBlog = () => {
               )}
             </div>
 
-            {/* Unlimited Emoji Picker Component */}
             <div className="relative" ref={emojiPickerRef}>
               <button
                 type="button"
@@ -338,6 +382,21 @@ const EditBlog = () => {
           {uploading ? "Uploading..." : "Update Blog"}
         </button>
       </form>
+
+      {/* Global Toast Stack Layer Overlay Node */}
+      <ToastContainer toasts={toasts} removeToast={removeToast} />
+
+      {/* Luxury Intercept Confirmation Modal Hook */}
+      <Modal
+        isOpen={isModalOpen}
+        title="Save Changes?"
+        message="Are you sure you want to write these modifications to the database? This action will update the live public post feed directly."
+        confirmLabel="Save Modifications"
+        cancelLabel="Discard"
+        variant="info"
+        onConfirm={executeUpdatePayload}
+        onCancel={() => setIsModalOpen(false)}
+      />
     </div>
   );
 };

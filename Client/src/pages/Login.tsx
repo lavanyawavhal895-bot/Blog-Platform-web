@@ -42,7 +42,15 @@ const Login = () => {
 
       alert("Login Successful");
 
-      navigate("/dashboard");
+      /**
+       * Dynamic Redirect Logic Block
+       * Evaluates user status role and navigates to the correct target dashboard workspace
+       */
+      if (res.data.user && res.data.user.role === "admin") {
+        navigate("/admin");
+      } else {
+        navigate("/dashboard");
+      }
     } catch (error) {
       alert("Login Failed");
     }
@@ -83,7 +91,7 @@ const Login = () => {
 
           <button
             type="submit"
-            className="w-full py-4 rounded-xl font-semibold text-white bg-gradient-to-r from-purple-600 to-blue-600"
+            className="w-full py-4 rounded-xl font-semibold text-white bg-gradient-to-r from-purple-600 to-blue-600 hover:opacity-90 transition-opacity"
           >
             Sign In
           </button>

@@ -71,6 +71,16 @@ const Navbar = () => {
               My Blogs
             </Link>
 
+            {/* Admin Dashboard Conditional Route Node */}
+            {user?.role === "admin" && (
+              <Link
+                to="/admin"
+                className="text-red-400 font-medium hover:text-red-300 transition-all duration-300 flex items-center gap-1"
+              >
+                🛡️ Admin Panel
+              </Link>
+            )}
+
             <Link
               to="/create-blog"
               className="relative px-8 py-3 rounded-full overflow-hidden transition-all duration-300 hover:-translate-y-1 active:scale-95"
@@ -109,14 +119,19 @@ const Navbar = () => {
 
           {/* Right Section */}
           <div className="flex items-center gap-3">
-            {/* Avatar */}
+            {/* Avatar showing role context subheader info on hovering or layout tracking */}
             <div
-              className="w-10 h-10 rounded-full flex items-center justify-center text-white font-bold text-sm"
+              title={`Logged in as ${user?.username} (${user?.role || "user"})`}
+              className="w-10 h-10 rounded-full flex items-center justify-center text-white font-bold text-sm uppercase select-none"
               style={{
                 background:
-                  "linear-gradient(135deg,#00d4ff,#3a86ff)",
+                  user?.role === "admin"
+                    ? "linear-gradient(135deg, #ff006e, #8338ec)"
+                    : "linear-gradient(135deg,#00d4ff,#3a86ff)",
                 boxShadow:
-                  "0 0 18px rgba(58,134,255,.5)",
+                  user?.role === "admin"
+                    ? "0 0 18px rgba(255,0,110,.5)"
+                    : "0 0 18px rgba(58,134,255,.5)",
               }}
             >
               {user?.username?.charAt(0)?.toUpperCase() || "U"}
@@ -170,32 +185,43 @@ const Navbar = () => {
           <div
             className="md:hidden mt-4 rounded-3xl p-5"
             style={{
-              background: "rgba(255,255,255,.04)",
+              background: "rgba(15, 10, 30, 0.95)",
               backdropFilter: "blur(20px)",
               border: "1px solid rgba(255,255,255,.08)",
             }}
           >
             <div className="flex flex-col gap-4">
               <Link
-                to="/"
+                to="/Dashboard"
                 onClick={() => setIsOpen(false)}
-                className="text-white/70 hover:text-white"
+                className="text-white/70 hover:text-white py-1"
               >
-                Explore
+                Dashboard
               </Link>
 
               <Link
                 to="/my-blogs"
                 onClick={() => setIsOpen(false)}
-                className="text-white/70 hover:text-white"
+                className="text-white/70 hover:text-white py-1"
               >
                 My Blogs
               </Link>
 
+              {/* Mobile View Admin Link */}
+              {user?.role === "admin" && (
+                <Link
+                  to="/admin"
+                  onClick={() => setIsOpen(false)}
+                  className="text-red-400 font-medium hover:text-red-300 py-1"
+                >
+                  🛡️ Admin Panel
+                </Link>
+              )}
+
               <Link
                 to="/create-blog"
                 onClick={() => setIsOpen(false)}
-                className="relative text-center px-6 py-3 rounded-full overflow-hidden"
+                className="relative text-center px-6 py-3 rounded-full overflow-hidden mt-2"
                 style={{
                   background:
                     "linear-gradient(180deg, rgba(255,255,255,.95), rgba(220,225,230,.95))",
@@ -214,7 +240,7 @@ const Navbar = () => {
 
               <button
                 onClick={handleLogout}
-                className="px-4 py-3 rounded-full text-white"
+                className="px-4 py-3 rounded-full text-white mt-1 text-center"
                 style={{
                   background: "rgba(255,255,255,.05)",
                   border: "1px solid rgba(255,255,255,.08)",

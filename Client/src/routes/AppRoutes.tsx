@@ -7,6 +7,7 @@ import CreateBlog from "../pages/CreateBlog";
 import EditBlog from "../pages/EditBlog";
 import BlogDetails from "../pages/BlogDetails";
 import MyBlogs from "../pages/MyBlogs";
+import AdminDashboard from "../pages/AdminDashboard"; // 1. Added Admin Dashboard Import
 
 import ProtectedRoute from "../components/ProtectedRoute";
 
@@ -56,6 +57,16 @@ const AppRoutes = () => {
         element={
           <ProtectedRoute>
             <MyBlogs />
+          </ProtectedRoute>
+        }
+      />
+
+      {/* 2. Admin Portal Route */}
+      <Route
+        path="/admin"
+        element={
+          <ProtectedRoute>
+            <AdminDashboard />
           </ProtectedRoute>
         }
       />

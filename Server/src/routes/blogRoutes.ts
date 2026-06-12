@@ -7,23 +7,18 @@ import {
   deleteBlog,
   getMyBlogs,
 } from "../controllers/blogController";
+import { protect } from "../middleware/authMiddleware";
 
 const router = express.Router();
 
-router.post("/", createBlog);
-
+// Public Routes - anyone can browse blogs or read a single post
 router.get("/", getBlogs);
-
-// IMPORTANT: put this BEFORE  "/:id"
-router.get(
-  "/user/:userId",
-  getMyBlogs
-);
-
 router.get("/:id", getBlogById);
 
-router.put("/:id", updateBlog);
-
-router.delete("/:id", deleteBlog);
+// Protected Routes - requires a user to be logged in with a valid Bearer token
+router.post("/", protect, createBlog);
+router.get("/user/:userId", protect, getMyBlogs);
+router.put("/:id", protect, updateBlog);
+router.delete("/:id", protect, deleteBlog);
 
 export default router;

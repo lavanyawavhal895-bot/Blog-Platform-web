@@ -1,30 +1,39 @@
-import express from "express";
-import cors from "cors";
+// 1. Load Environment Configuration Variables first to ensure they are available to all subsequent imports
 import dotenv from "dotenv";
-import connectDB from "./config/db";
+dotenv.config();
 
+// 2. Standard Framework and Middleware Imports
+import express, { Request, Response } from "express";
+import cors from "cors";
+import connectDB from "./config/db";
+// 3. Routes Imports
 import authRoutes from "./routes/authRoutes";
 import blogRoutes from "./routes/blogRoutes";
 import uploadRoutes from "./routes/uploadRoutes";
+import adminRoutes from "./routes/adminRoutes";
 
-dotenv.config();
-
+// Initialize Express Framework
 const app = express();
 
+// Connect to MongoDB Database Instances (Now securely reads the initialized process.env)
 connectDB();
 
+// Global Middleware Configuration
 app.use(cors());
 app.use(express.json());
 
-// Routes
+// Main API Endpoints Mounting Matrix Setup
 app.use("/api/auth", authRoutes);
 app.use("/api/blogs", blogRoutes);
 app.use("/api/upload", uploadRoutes);
+app.use("/api/admin", adminRoutes); // Secured admin endpoints layer fully operational
 
-app.get("/", (req, res) => {
+// Base Health Check Route
+app.get("/", (req: Request, res: Response) => {
   res.send("Blog CMS API Running 🚀");
 });
 
+// Start Server Deployment Engine Listeners
 const PORT = process.env.PORT || 5000;
 
 app.listen(PORT, () => {
