@@ -14,7 +14,7 @@ router.post("/", createBlog);
 
 router.get("/", getBlogs);
 
-// IMPORTANT: put this BEFORE "/:id"
+// IMPORTANT: put this BEFORE  "/:id"
 router.get(
   "/user/:userId",
   getMyBlogs

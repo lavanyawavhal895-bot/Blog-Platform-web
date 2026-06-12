@@ -5,7 +5,7 @@ import jwt from "jsonwebtoken";
 
 const JWT_SECRET = process.env.JWT_SECRET || "blogcmssecret";
 
-// Register (already done)
+// Register User
 export const register = async (req: Request, res: Response) => {
   try {
     const { username, email, password } = req.body;
@@ -23,13 +23,17 @@ export const register = async (req: Request, res: Response) => {
       password: hashedPassword,
     });
 
-    res.status(201).json({ message: "User registered successfully", userId: user._id });
+    return res.status(201).json({ 
+      message: "User registered successfully", 
+      userId: user._id 
+    });
   } catch (error) {
-    res.status(500).json({ message: "Server Error" });
+    console.error("Register Error:", error);
+    return res.status(500).json({ message: "Server Error" });
   }
 };
 
-// New: Login
+// Login User
 export const login = async (req: Request, res: Response) => {
   try {
     const { email, password } = req.body;
@@ -44,13 +48,14 @@ export const login = async (req: Request, res: Response) => {
       return res.status(400).json({ message: "Invalid credentials" });
     }
 
+    // Standardized payload parameter schema key to 'id' to seamlessly align with req.user.id mapping
     const token = jwt.sign(
-      { userId: user._id, role: user.role },
+      { id: user._id, role: user.role },
       JWT_SECRET,
       { expiresIn: "7d" }
     );
 
-    res.json({
+    return res.json({
       token,
       user: {
         id: user._id,
@@ -60,6 +65,7 @@ export const login = async (req: Request, res: Response) => {
       },
     });
   } catch (error) {
-    res.status(500).json({ message: "Server Error" });
+    console.error("Login Error:", error);
+    return res.status(500).json({ message: "Server Error" });
   }
 };
