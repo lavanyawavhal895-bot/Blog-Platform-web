@@ -1,27 +1,22 @@
 import { useState } from "react";
 import axios from "axios";
 import { useNavigate, Link } from "react-router-dom";
+import ShaderBackground from "../components/ui/ShaderBackground";
+import { Eye, EyeOff } from "lucide-react";
+import { useAuth } from "../context/AuthContext";
 
 const Login = () => {
   const navigate = useNavigate();
+  const { login } = useAuth();
+
+  const [showPassword, setShowPassword] = useState(false);
 
   const [formData, setFormData] = useState({
     email: "",
     password: "",
   });
 
-  const handleChange = (
-    e: React.ChangeEvent<HTMLInputElement>
-  ) => {
-    setFormData({
-      ...formData,
-      [e.target.name]: e.target.value,
-    });
-  };
-
-  const handleSubmit = async (
-    e: React.FormEvent
-  ) => {
+  const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
 
     try {
@@ -30,82 +25,109 @@ const Login = () => {
         formData
       );
 
-      localStorage.setItem(
-        "token",
-        res.data.token
-      );
+      console.log("Login Response:", res.data);
 
-      localStorage.setItem(
-        "user",
-        JSON.stringify(res.data.user)
-      );
+      login(res.data.user, res.data.token);
 
-      alert("Login Successful");
+      alert("Login Successful!");
 
-      /**
-       * Dynamic Redirect Logic Block
-       * Evaluates user status role and navigates to the correct target dashboard workspace
-       */
-      if (res.data.user && res.data.user.role === "admin") {
+      if (res.data.user.role === "admin") {
         navigate("/admin");
       } else {
         navigate("/dashboard");
       }
-    } catch (error) {
-      alert("Login Failed");
+    } catch (error: any) {
+      console.error(error);
+
+      if (error.response?.status === 403) {
+        alert("Please verify your email first.");
+      } else {
+        alert(error.response?.data?.message || "Login failed");
+      }
     }
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-slate-950 via-indigo-950 to-slate-900 px-4">
-      <div className="absolute w-96 h-96 bg-purple-600/30 rounded-full blur-3xl top-20 left-20"></div>
-      <div className="absolute w-96 h-96 bg-blue-600/30 rounded-full blur-3xl bottom-20 right-20"></div>
+    <div className="relative min-h-screen w-full flex items-center justify-center p-4">
+      <ShaderBackground />
 
-      <div className="relative w-full max-w-md backdrop-blur-xl bg-white/10 border border-white/20 rounded-3xl shadow-2xl p-8">
-        <h1 className="text-4xl font-bold text-white text-center mb-2">
-          Welcome Back 👋
-        </h1>
+      <div className="relative w-full max-w-md p-8 rounded-3xl backdrop-blur-xl bg-white/10 border border-white/20 shadow-[0_8px_32px_0_rgba(31,38,135,0.37)]">
 
-        <p className="text-slate-300 text-center mb-8">
-          Login to continue your blogging journey
-        </p>
+        <form onSubmit={handleLogin} className="space-y-6">
 
-        <form onSubmit={handleSubmit} className="space-y-5">
+          <h2 className="text-3xl font-bold text-white text-center">
+            Welcome Back
+          </h2>
+
           <input
             type="email"
-            name="email"
-            placeholder="Email Address"
+            placeholder="Email"
             value={formData.email}
-            onChange={handleChange}
-            className="w-full p-4 rounded-xl bg-white/10 border border-white/20 text-white placeholder-slate-400 outline-none focus:border-purple-500"
+            onChange={(e) =>
+              setFormData({
+                ...formData,
+                email: e.target.value,
+              })
+            }
+            className="w-full p-4 rounded-xl bg-white/5 border border-white/10 text-white placeholder-slate-300 focus:outline-none focus:ring-2 focus:ring-purple-500"
+            required
           />
 
-          <input
-            type="password"
-            name="password"
-            placeholder="Password"
-            value={formData.password}
-            onChange={handleChange}
-            className="w-full p-4 rounded-xl bg-white/10 border border-white/20 text-white placeholder-slate-400 outline-none focus:border-purple-500"
-          />
+          <div className="relative">
+            <input
+              type={showPassword ? "text" : "password"}
+              placeholder="Password"
+              value={formData.password}
+              onChange={(e) =>
+                setFormData({
+                  ...formData,
+                  password: e.target.value,
+                })
+              }
+              className="w-full p-4 rounded-xl bg-white/5 border border-white/10 text-white placeholder-slate-300 focus:outline-none focus:ring-2 focus:ring-purple-500"
+              required
+            />
+
+            <button
+              type="button"
+              onClick={() => setShowPassword(!showPassword)}
+              className="absolute right-4 top-4 text-slate-300"
+            >
+              {showPassword ? (
+                <EyeOff size={20} />
+              ) : (
+                <Eye size={20} />
+              )}
+            </button>
+          </div>
 
           <button
             type="submit"
-            className="w-full py-4 rounded-xl font-semibold text-white bg-gradient-to-r from-purple-600 to-blue-600 hover:opacity-90 transition-opacity"
+            className="w-full py-4 bg-gradient-to-r from-purple-600 to-blue-600 rounded-xl text-white font-bold hover:shadow-[0_0_20px_rgba(168,85,247,0.4)] transition-all"
           >
-            Sign In
+            Login
           </button>
-        </form>
 
-        <p className="text-center text-slate-300 mt-6">
-          Don't have an account?
-          <Link
-            to="/register"
-            className="text-purple-400 ml-2 hover:text-purple-300"
-          >
-            Register
-          </Link>
-        </p>
+          <div className="flex flex-col items-center gap-3 mt-4 text-sm">
+            <Link
+              to="/forgot-password"
+              className="text-slate-300 hover:text-white transition-colors"
+            >
+              Forgot Password?
+            </Link>
+
+            <p className="text-slate-400">
+              Don't have an account?{" "}
+              <Link
+                to="/register"
+                className="text-purple-400 font-bold hover:underline"
+              >
+                Register
+              </Link>
+            </p>
+          </div>
+
+        </form>
       </div>
     </div>
   );

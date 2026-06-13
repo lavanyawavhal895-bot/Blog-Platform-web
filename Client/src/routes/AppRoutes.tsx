@@ -1,75 +1,43 @@
-import { Routes, Route } from "react-router-dom";
+import { Routes, Route, Navigate } from "react-router-dom";
 
 import Login from "../pages/Login";
 import Register from "../pages/Register";
+import ForgotPassword from "../pages/ForgotPassword";
 import Dashboard from "../pages/Dashboard";
+import AdminDashboard from "../pages/AdminDashboard";
 import CreateBlog from "../pages/CreateBlog";
-import EditBlog from "../pages/EditBlog";
-import BlogDetails from "../pages/BlogDetails";
 import MyBlogs from "../pages/MyBlogs";
-import AdminDashboard from "../pages/AdminDashboard"; // 1. Added Admin Dashboard Import
+import BlogDetails from "../pages/BlogDetails";
+import EditBlog from "../pages/EditBlog";
 
 import ProtectedRoute from "../components/ProtectedRoute";
 
 const AppRoutes = () => {
   return (
     <Routes>
-      {/* Public Routes */}
-      <Route path="/" element={<Login />} />
+      {/* Public */}
       <Route path="/login" element={<Login />} />
       <Route path="/register" element={<Register />} />
+      <Route path="/forgot-password" element={<ForgotPassword />} />
 
-      {/* Protected Routes */}
-      <Route
-        path="/dashboard"
-        element={
-          <ProtectedRoute>
-            <Dashboard />
-          </ProtectedRoute>
-        }
-      />
+      {/* User Routes */}
+      <Route element={<ProtectedRoute />}>
+        <Route path="/" element={<Navigate to="/dashboard" replace />} />
 
-      <Route
-        path="/blog/:id"
-        element={<BlogDetails />}
-      />
+        <Route path="/dashboard" element={<Dashboard />} />
+        <Route path="/create-blog" element={<CreateBlog />} />
+        <Route path="/my-blogs" element={<MyBlogs />} />
+        <Route path="/blog/:id" element={<BlogDetails />} />
+        <Route path="/edit-blog/:id" element={<EditBlog />} />
+      </Route>
 
-      <Route
-        path="/create-blog"
-        element={
-          <ProtectedRoute>
-            <CreateBlog />
-          </ProtectedRoute>
-        }
-      />
+      {/* Admin */}
+      <Route element={<ProtectedRoute requiredRole="admin" />}>
+        <Route path="/admin" element={<AdminDashboard />} />
+      </Route>
 
-      <Route
-        path="/edit-blog/:id"
-        element={
-          <ProtectedRoute>
-            <EditBlog />
-          </ProtectedRoute>
-        }
-      />
-
-      <Route
-        path="/my-blogs"
-        element={
-          <ProtectedRoute>
-            <MyBlogs />
-          </ProtectedRoute>
-        }
-      />
-
-      {/* 2. Admin Portal Route */}
-      <Route
-        path="/admin"
-        element={
-          <ProtectedRoute>
-            <AdminDashboard />
-          </ProtectedRoute>
-        }
-      />
+      {/* 404 */}
+      <Route path="*" element={<Navigate to="/dashboard" replace />} />
     </Routes>
   );
 };

@@ -2,6 +2,7 @@
 
 import React, { useEffect, useState, useRef } from "react";
 import { Navigate, useNavigate } from "react-router-dom";
+
 import axios from "axios";
 import { 
   AreaChart, 
@@ -12,6 +13,7 @@ import {
   CartesianGrid 
 } from "recharts";
 import { WebGLShader } from "../components/ui/WebGLShader.tsx";
+import { useAuth } from "../context/AuthContext"; // Import the hook
 
 // Premium UI Polish Components Injected
 import { Modal } from "../components/ui/Modal";
@@ -58,8 +60,8 @@ interface ModalConfig {
 }
 
 const AdminDashboard = () => {
-  const user = JSON.parse(localStorage.getItem("user") || "{}");
-  const token = localStorage.getItem("token");
+  // Use the context instead of direct localStorage access
+  const { user, token } = useAuth();
   const navigate = useNavigate();
 
   // Core Data States
@@ -87,12 +89,12 @@ const AdminDashboard = () => {
 
   // Dedicated Component Data Loading Lifecycle 
   useEffect(() => {
-    if (user.role === "admin" && token) {
+    if (user?.role === "admin" && token) {
       fetchDashboardData();
     }
-  }, []);
+  }, [user, token]); // Re-run if auth state changes
 
-  // FIX: Isolated Resize Tracking Engine to prevent structural state feedback updates
+  // Isolated Resize Tracking Engine
   useEffect(() => {
     if (!chartBoxRef.current) return;
 
@@ -109,7 +111,7 @@ const AdminDashboard = () => {
 
     observer.observe(chartBoxRef.current);
     return () => observer.disconnect();
-  }, [chartData]); // Only reset loop when backend chart configurations load
+  }, [chartData]);
 
   // Toast dispatch abstraction helper
   const addToast = (text: string, type: "success" | "error" | "info") => {
@@ -153,7 +155,6 @@ const AdminDashboard = () => {
     fetchDashboardData(userSearch);
   };
 
-  // Intercept and handle User Access Privileges Changes via Modal
   const handleToggleRoleClick = (targetUser: UserInfo) => {
     const newRole = targetUser.role === "admin" ? "user" : "admin";
     
@@ -180,7 +181,6 @@ const AdminDashboard = () => {
     }
   };
 
-  // Intercept and handle User Purge Operations via Modal
   const handleDeleteUserClick = (userId: string, username: string) => {
     setModalConfig({
       isOpen: true,
@@ -204,7 +204,6 @@ const AdminDashboard = () => {
     }
   };
 
-  // Intercept and handle Article Destruction Operations via Modal
   const handleDeleteBlogClick = (blogId: string, title: string) => {
     setModalConfig({
       isOpen: true,
@@ -230,7 +229,7 @@ const AdminDashboard = () => {
     }
   };
 
-  if (!token || user.role !== "admin") {
+  if (!token || user?.role !== "admin") {
     return <Navigate to="/dashboard" replace={true} />;
   }
 
@@ -239,18 +238,14 @@ const AdminDashboard = () => {
       ref={containerRef}
       className="min-h-screen text-white pb-16 relative overflow-hidden bg-gradient-to-br from-slate-950 via-indigo-950 to-slate-900"
     >
-      {/* Ambient Background Light Orbs */}
       <div className="absolute w-[500px] h-[500px] bg-purple-600/10 rounded-full blur-3xl top-[-10%] left-[-10%] pointer-events-none z-0"></div>
       <div className="absolute w-[500px] h-[500px] bg-blue-600/10 rounded-full blur-3xl bottom-[-10%] right-[-10%] pointer-events-none z-0"></div>
 
-      {/* WebGL Shader Canvas background overlay injection - FIX: Explicit pointer layer containment */}
       <div className="absolute inset-0 z-0 pointer-events-none opacity-30">
         <WebGLShader />
       </div>
 
       <div className="relative z-10 pt-24 px-4 md:px-12 max-w-7xl mx-auto w-full">
-        
-        {/* Header Block */}
         <div className="mb-10">
           <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full text-xs font-semibold tracking-widest bg-purple-500/10 border border-purple-500/30 text-purple-400 uppercase mb-3">
             <span className="w-1.5 h-1.5 rounded-full bg-purple-500 animate-pulse" />
@@ -261,7 +256,6 @@ const AdminDashboard = () => {
           </h1>
         </div>
 
-        {/* 4-Column Summary Cards */}
         <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
           {[
             { label: "Total Users", value: summary?.totalUsers },
@@ -276,11 +270,9 @@ const AdminDashboard = () => {
           ))}
         </div>
 
-        {/* Recharts Graphical Distribution Matrix */}
         {chartData.length > 0 && (
           <div className="p-6 rounded-xl border border-white/10 bg-white/5 backdrop-blur-xl mb-10 shadow-xl">
             <h3 className="text-sm font-bold uppercase tracking-wider text-slate-300 mb-6">Article Publishing Velocity</h3>
-            
             <div ref={chartBoxRef} className="w-full flex justify-center items-center overflow-hidden min-h-[260px]">
               {dimensions.width > 0 ? (
                 <AreaChart 
@@ -312,7 +304,6 @@ const AdminDashboard = () => {
           </div>
         )}
 
-        {/* Tab Controls & Search Utilities */}
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6 border-b border-white/10 pb-4">
           <div className="flex gap-2 bg-white/5 p-1 rounded-xl self-start border border-white/10 w-full sm:w-auto">
             <button
@@ -349,14 +340,12 @@ const AdminDashboard = () => {
           )}
         </div>
 
-        {/* Dynamic Data Interface Tables with Minimum Height Bounds to Prevent Layout Collapse */}
         <div className="min-h-[350px] relative z-10">
           {loading ? (
             <div className="py-24 text-center text-sm text-slate-400 animate-pulse tracking-widest uppercase">
               Syncing directory instances...
             </div>
           ) : activeTab === "users" ? (
-            /* User management table */
             <div className="border border-white/10 bg-white/5 backdrop-blur-xl rounded-2xl overflow-hidden shadow-xl">
               <div className="overflow-x-auto">
                 <table className="w-full text-left border-collapse">
@@ -381,7 +370,7 @@ const AdminDashboard = () => {
                           </span>
                         </td>
                         <td className="p-4 text-right pr-6 space-x-2 whitespace-nowrap">
-                          {u._id !== user.id ? (
+                          {u._id !== user?.id ? (
                             <>
                               <button
                                 onClick={() => handleToggleRoleClick(u)}
@@ -402,17 +391,11 @@ const AdminDashboard = () => {
                         </td>
                       </tr>
                     ))}
-                    {users.length === 0 && (
-                      <tr>
-                        <td colSpan={4} className="p-8 text-center text-slate-400 italic">No corresponding user records found.</td>
-                      </tr>
-                    )}
                   </tbody>
                 </table>
               </div>
             </div>
           ) : (
-            /* Blog management table */
             <div className="border border-white/10 bg-white/5 backdrop-blur-xl rounded-2xl overflow-hidden shadow-xl">
               <div className="overflow-x-auto">
                 <table className="w-full text-left border-collapse">
@@ -446,11 +429,6 @@ const AdminDashboard = () => {
                         </td>
                       </tr>
                     ))}
-                    {blogs.length === 0 && (
-                      <tr>
-                        <td colSpan={4} className="p-8 text-center text-slate-400 italic">No published articles found.</td>
-                      </tr>
-                    )}
                   </tbody>
                 </table>
               </div>
@@ -459,10 +437,7 @@ const AdminDashboard = () => {
         </div>
       </div>
 
-      {/* Global Fluid Toast Stack Node */}
       <ToastContainer toasts={toasts} removeToast={removeToast} />
-
-      {/* Premium Integrated Reusable Action Confirmation Intercept Modal */}
       <Modal
         isOpen={modalConfig.isOpen}
         title={modalConfig.title}

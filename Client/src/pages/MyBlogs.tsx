@@ -179,39 +179,62 @@ const MyBlogs = () => {
     { value: "az", label: "A – Z" },
     { value: "za", label: "Z – A" },
   ];
+useEffect(() => {
+  fetchBlogs();
 
-  useEffect(() => {
-    fetchBlogs();
+  const handleClickOutside = (event: MouseEvent) => {
+    if (
+      dropdownRef.current &&
+      !dropdownRef.current.contains(event.target as Node)
+    ) {
+      setIsDropdownOpen(false);
+    }
+  };
 
-    // Close custom dropdown if clicked outside
-    const handleClickOutside = (event: MouseEvent) => {
-      if (dropdownRef.current && !dropdownRef.current.contains(event.target as Node)) {
-        setIsDropdownOpen(false);
+  document.addEventListener("mousedown", handleClickOutside);
+
+  return () =>
+    document.removeEventListener("mousedown", handleClickOutside);
+}, []);
+
+ const fetchBlogs = async () => {
+  try {
+    const token = localStorage.getItem("token");
+
+    const res = await axios.get(
+      `http://localhost:5000/api/blogs/user/${user.id}`,
+      {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
       }
-    };
-    document.addEventListener("mousedown", handleClickOutside);
-    return () => document.removeEventListener("mousedown", handleClickOutside);
-  }, []);
+    );
 
-  const fetchBlogs = async () => {
-    try {
-      const res = await axios.get(`http://localhost:5000/api/blogs/user/${user.id}`);
-      setBlogs(res.data);
-    } catch (error) {
-      console.log(error);
-    }
-  };
+    setBlogs(res.data);
+  } catch (error) {
+    console.log(error);
+  }
+};
+ const deleteBlog = async (id: string) => {
+  if (!window.confirm("Are you sure you want to delete this blog?")) return;
 
-  const deleteBlog = async (id: string) => {
-    if (!window.confirm("Are you sure you want to delete this blog?")) return;
-    try {
-      await axios.delete(`http://localhost:5000/api/blogs/${id}`);
-      fetchBlogs();
-    } catch (error) {
-      alert("Delete Failed");
-    }
-  };
+  try {
+    const token = localStorage.getItem("token");
 
+    await axios.delete(
+      `http://localhost:5000/api/blogs/${id}`,
+      {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      }
+    );
+
+    fetchBlogs();
+  } catch (error) {
+    alert("Delete Failed");
+  }
+};
   const filteredBlogs = blogs.filter((blog) =>
     blog.title.toLowerCase().includes(search.toLowerCase())
   );

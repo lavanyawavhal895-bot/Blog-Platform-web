@@ -10,8 +10,10 @@ interface AuthenticatedRequest extends Request {
   };
 }
 
-// Create Blog
-export const createBlog = async (req: Request, res: Response) => {
+export const createBlog = async (
+  req: AuthenticatedRequest,
+  res: Response
+) => {
   try {
     const {
       title,
@@ -19,7 +21,7 @@ export const createBlog = async (req: Request, res: Response) => {
       image,
       backgroundColor,
       textColor,
-      author,
+      fontStyle,
     } = req.body;
 
     const blog = await Blog.create({
@@ -28,12 +30,14 @@ export const createBlog = async (req: Request, res: Response) => {
       image,
       backgroundColor,
       textColor,
-      author,
+      fontStyle,
+      author: req.user?.id,
     });
 
     res.status(201).json(blog);
   } catch (error) {
     console.log("Create Blog Error:", error);
+
     res.status(500).json({
       message: "Server Error",
     });

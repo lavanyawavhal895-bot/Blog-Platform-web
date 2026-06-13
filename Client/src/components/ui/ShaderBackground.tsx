@@ -3,7 +3,7 @@
 import { useEffect, useRef } from "react"
 import * as THREE from "three"
 
-export function WebGLShader() {
+export default function WebGLShader() { // Changed to default export
   const canvasRef = useRef<HTMLCanvasElement>(null)
   const sceneRef = useRef<{
     scene: THREE.Scene | null
@@ -64,9 +64,7 @@ export function WebGLShader() {
       refs.renderer = new THREE.WebGLRenderer({ canvas })
       refs.renderer.setPixelRatio(window.devicePixelRatio)
       refs.renderer.setClearColor(new THREE.Color(0x000000))
-
       refs.camera = new THREE.OrthographicCamera(-1, 1, 1, -1, 0, -1)
-
       refs.uniforms = {
         resolution: { value: [window.innerWidth, window.innerHeight] },
         time: { value: 0.0 },
@@ -74,30 +72,18 @@ export function WebGLShader() {
         yScale: { value: 0.5 },
         distortion: { value: 0.05 },
       }
-
-      const position = [
-        -1.0, -1.0, 0.0,
-         1.0, -1.0, 0.0,
-        -1.0,  1.0, 0.0,
-         1.0, -1.0, 0.0,
-        -1.0,  1.0, 0.0,
-         1.0,  1.0, 0.0,
-      ]
-
+      const position = [-1.0, -1.0, 0.0, 1.0, -1.0, 0.0, -1.0, 1.0, 0.0, 1.0, -1.0, 0.0, -1.0, 1.0, 0.0, 1.0, 1.0, 0.0]
       const positions = new THREE.BufferAttribute(new Float32Array(position), 3)
       const geometry = new THREE.BufferGeometry()
       geometry.setAttribute("position", positions)
-
       const material = new THREE.RawShaderMaterial({
         vertexShader,
         fragmentShader,
         uniforms: refs.uniforms,
         side: THREE.DoubleSide,
       })
-
       refs.mesh = new THREE.Mesh(geometry, material)
       refs.scene.add(refs.mesh)
-
       handleResize()
     }
 
@@ -127,18 +113,11 @@ export function WebGLShader() {
       if (refs.mesh) {
         refs.scene?.remove(refs.mesh)
         refs.mesh.geometry.dispose()
-        if (refs.mesh.material instanceof THREE.Material) {
-          refs.mesh.material.dispose()
-        }
+        if (refs.mesh.material instanceof THREE.Material) refs.mesh.material.dispose()
       }
       refs.renderer?.dispose()
     }
   }, [])
 
-  return (
-    <canvas
-      ref={canvasRef}
-      className="fixed top-0 left-0 w-full h-full block"
-    />
-  )
+  return <canvas ref={canvasRef} className="fixed top-0 left-0 w-full h-full block -z-10" />
 }

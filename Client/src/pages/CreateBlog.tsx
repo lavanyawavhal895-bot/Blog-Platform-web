@@ -98,31 +98,45 @@ const CreateBlog = () => {
     }, 0);
   };
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    const user = JSON.parse(localStorage.getItem("user") || "{}");
+ const handleSubmit = async (e: React.FormEvent) => {
+  e.preventDefault();
 
-    try {
-      await axios.post("http://localhost:5000/api/blogs", {
+  const token = localStorage.getItem("token");
+
+  if (!token) {
+    alert("Please login first");
+    return;
+  }
+
+  try {
+    await axios.post(
+      "http://localhost:5000/api/blogs",
+      {
         title,
         content,
         image,
         textColor,
         fontStyle,
-        author: user.id,
-      });
+      },
+      {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      }
+    );
 
-      alert("Blog Created Successfully");
-      setTitle("");
-      setContent("");
-      setImage("");
-      setTextColor("#FFFFFF");
-      setFontStyle("ui-sans-serif, system-ui, sans-serif");
-    } catch (error: any) {
-      console.log(error);
-      alert("Failed to create blog");
-    }
-  };
+    alert("Blog Created Successfully");
+
+    setTitle("");
+    setContent("");
+    setImage("");
+    setTextColor("#FFFFFF");
+    setFontStyle("ui-sans-serif, system-ui, sans-serif");
+  } catch (error: any) {
+    console.log(error);
+    alert(error.response?.data?.message || "Failed to create blog");
+  }
+};
 
   return (
     // Fixed relative positioning node to hold the interactive background canvas layer layout bounds safely

@@ -1,20 +1,33 @@
-import { useLocation } from "react-router-dom";
+import { BrowserRouter, useLocation } from "react-router-dom";
 import AppRoutes from "./routes/AppRoutes";
 import Navbar from "./components/Navbar";
+import { AuthProvider } from "./context/AuthContext";
 
-function App() {
+const AppContent = () => {
   const location = useLocation();
 
   const hideNavbar =
     location.pathname === "/login" ||
     location.pathname === "/register" ||
-    location.pathname === "/";
+    location.pathname === "/forgot-password";
 
   return (
-    <>
+    <div className="min-h-screen">
       {!hideNavbar && <Navbar />}
-      <AppRoutes />
-    </>
+      <main>
+        <AppRoutes />
+      </main>
+    </div>
+  );
+};
+
+function App() {
+  return (
+    <AuthProvider>
+      <BrowserRouter>
+        <AppContent />
+      </BrowserRouter>
+    </AuthProvider>
   );
 }
 
