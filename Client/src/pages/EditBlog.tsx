@@ -209,7 +209,7 @@ const EditBlog = () => {
         onSubmit={handleFormSubmitClick}
         className="bg-slate-900/80 backdrop-blur-xl p-8 rounded-3xl w-full max-w-3xl border border-slate-700/60 shadow-2xl relative z-10"
       >
-        <h1 className="text-4xl text-white mb-8 font-bold">Edit Luxury Blog</h1>
+        <h1 className="text-4xl text-white mb-8 font-bold">Edit  Blog</h1>
 
         <input
           type="text"
@@ -323,7 +323,7 @@ const EditBlog = () => {
                     >
                       <span>{option.label}</span>
                       <span className="text-[10px] text-slate-400 opacity-80" style={{ fontFamily: option.value }}>
-                        Luxury Typography Preview
+                         Typography Preview
                       </span>
                     </button>
                   ))}

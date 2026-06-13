@@ -151,7 +151,7 @@ const CreateBlog = () => {
         onSubmit={handleSubmit} 
         className="bg-slate-900/80 backdrop-blur-xl p-8 rounded-3xl w-full max-w-3xl border border-slate-700/60 shadow-2xl relative space-y-5 z-10"
       >
-        <h1 className="text-4xl font-bold tracking-tight">Create Luxury Blog</h1>
+        <h1 className="text-4xl font-bold tracking-tight">Create  Blog</h1>
 
         {/* Title */}
         <input
@@ -229,7 +229,7 @@ const CreateBlog = () => {
               <img src={image} alt="Preview" className="w-full object-contain" />
             </div>
           )}
-          <h2 className="text-3xl font-bold tracking-tight">{title || "Your Luxury Blog Title"}</h2>
+          <h2 className="text-3xl font-bold tracking-tight">{title || "Your Blog Title"}</h2>
           <p className="mt-4 whitespace-pre-wrap leading-relaxed">{content || "Your blog content preview will appear here..."}</p>
         </div>
 
@@ -268,7 +268,7 @@ const CreateBlog = () => {
                     >
                       <span>{option.label}</span>
                       <span className="text-[10px] text-slate-400 opacity-80" style={{ fontFamily: option.value }}>
-                        Luxury Typography Preview
+                         Typography Preview
                       </span>
                     </button>
                   ))}
