@@ -202,7 +202,7 @@ useEffect(() => {
     const token = localStorage.getItem("token");
 
     const res = await axios.get(
-      `http://localhost:5000/api/blogs/user/${user.id}`,
+      `https://blog-platform-web-gqdd.onrender.com/api/blogs/user/${user.id}`,
       {
         headers: {
           Authorization: `Bearer ${token}`,
@@ -222,7 +222,7 @@ useEffect(() => {
     const token = localStorage.getItem("token");
 
     await axios.delete(
-      `http://localhost:5000/api/blogs/${id}`,
+      `https://blog-platform-web-gqdd.onrender.com/api/blogs/${id}`,
       {
         headers: {
           Authorization: `Bearer ${token}`,

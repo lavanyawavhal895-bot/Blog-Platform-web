@@ -1,6 +1,6 @@
 "use client"
 
-import { useEffect, useRef, useState } from "react"
+import { useEffect, useRef, } from "react"
 import * as THREE from "three"
 
 interface Uniforms {
@@ -169,7 +169,6 @@ export function MilkyWayBackground() {
       const material = new THREE.RawShaderMaterial({
         vertexShader,
         fragmentShader,
-        uniforms: refs.uniforms,
         side: THREE.DoubleSide,
       })
 

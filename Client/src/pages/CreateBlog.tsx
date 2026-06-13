@@ -65,7 +65,7 @@ const CreateBlog = () => {
     formData.append("image", file);
 
     try {
-      const res = await axios.post("http://localhost:5000/api/upload/image", formData, {
+      const res = await axios.post("https://blog-platform-web-gqdd.onrender.com/api/upload/image", formData, {
         headers: {
           "Content-Type": "multipart/form-data",
         },
@@ -110,7 +110,7 @@ const CreateBlog = () => {
 
   try {
     await axios.post(
-      "http://localhost:5000/api/blogs",
+      "https://blog-platform-web-gqdd.onrender.com/api/blogs",
       {
         title,
         content,

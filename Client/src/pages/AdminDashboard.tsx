@@ -129,13 +129,13 @@ const AdminDashboard = () => {
       const config = { headers: { Authorization: `Bearer ${token}` } };
 
       const userUrl = searchStr 
-        ? `http://localhost:5000/api/admin/users?search=${encodeURIComponent(searchStr)}`
-        : "http://localhost:5000/api/admin/users";
+        ? `https://blog-platform-web-gqdd.onrender.com/api/admin/users?search=${encodeURIComponent(searchStr)}`
+        : "https://blog-platform-web-gqdd.onrender.com/api/admin/users";
 
       const [statsRes, usersRes, blogsRes] = await Promise.all([
-        axios.get("http://localhost:5000/api/admin/stats", config),
+        axios.get("https://blog-platform-web-gqdd.onrender.com/api/admin/stats", config),
         axios.get(userUrl, config),
-        axios.get("http://localhost:5000/api/admin/blogs", config)
+        axios.get("https://blog-platform-web-gqdd.onrender.com/api/admin/blogs", config)
       ]);
 
       setSummary(statsRes.data.summary);
@@ -171,7 +171,7 @@ const AdminDashboard = () => {
     setModalConfig((prev) => ({ ...prev, isOpen: false }));
     try {
       const config = { headers: { Authorization: `Bearer ${token}` } };
-      await axios.patch(`http://localhost:5000/api/admin/user-role/${targetUser._id}`, { role: newRole }, config);
+      await axios.patch(`https://blog-platform-web-gqdd.onrender.com/api/admin/user-role/${targetUser._id}`, { role: newRole }, config);
       
       setUsers(users.map(u => u._id === targetUser._id ? { ...u, role: newRole } : u));
       addToast(`Privileges for ${targetUser.username} updated to ${newRole}.`, "success");
@@ -195,7 +195,7 @@ const AdminDashboard = () => {
     setModalConfig((prev) => ({ ...prev, isOpen: false }));
     try {
       const config = { headers: { Authorization: `Bearer ${token}` } };
-      await axios.delete(`http://localhost:5000/api/admin/user/${userId}`, config);
+      await axios.delete(`https://blog-platform-web-gqdd.onrender.com/api/admin/user/${userId}`, config);
       addToast("User account lifecycle record purged successfully.", "success");
       fetchDashboardData(userSearch);
     } catch (error) {
@@ -218,7 +218,7 @@ const AdminDashboard = () => {
     setModalConfig((prev) => ({ ...prev, isOpen: false }));
     try {
       const config = { headers: { Authorization: `Bearer ${token}` } };
-      await axios.delete(`http://localhost:5000/api/admin/blog/${blogId}`, config);
+      await axios.delete(`https://blog-platform-web-gqdd.onrender.com/api/admin/blog/${blogId}`, config);
       
       setBlogs(blogs.filter(b => b._id !== blogId));
       if (summary) setSummary({ ...summary, totalBlogs: summary.totalBlogs - 1 });

@@ -30,7 +30,7 @@ const BlogDetails = () => {
   const fetchBlog = async () => {
     try {
       const res = await axios.get(
-        `http://localhost:5000/api/blogs/${id}`
+        `https://blog-platform-web-gqdd.onrender.com/api/blogs/${id}`
       );
 
       setBlog(res.data);

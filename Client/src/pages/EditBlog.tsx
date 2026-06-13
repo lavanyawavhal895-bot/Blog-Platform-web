@@ -85,7 +85,7 @@ const EditBlog = () => {
 
   const fetchBlog = async () => {
     try {
-      const res = await axios.get(`http://localhost:5000/api/blogs/${id}`);
+      const res = await axios.get(`https://blog-platform-web-gqdd.onrender.com/api/blogs/${id}`);
 
       setFormData({
         title: res.data.title || "",
@@ -116,7 +116,7 @@ const EditBlog = () => {
         },
       };
 
-      const res = await axios.post("http://localhost:5000/api/upload/image", uploadData, config);
+      const res = await axios.post("https://blog-platform-web-gqdd.onrender.com/api/upload/image", uploadData, config);
 
       setFormData((prev) => ({
         ...prev,
@@ -180,7 +180,7 @@ const EditBlog = () => {
         },
       };
 
-      await axios.put(`http://localhost:5000/api/blogs/${id}`, formData, config);
+      await axios.put(`https://blog-platform-web-gqdd.onrender.com/api/blogs/${id}`, formData, config);
       
       addToast("Blog documentation compilation saved successfully!", "success");
       

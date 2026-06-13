@@ -2,7 +2,7 @@ import axios from 'axios';
 
 // Create a central axios instance with your base URL
 const apiClient = axios.create({
-  baseURL: 'http://localhost:5000/api',
+  baseURL: 'https://blog-platform-web-gqdd.onrender.com//api',
 });
 
 // Request interceptor to automatically add the token to every request

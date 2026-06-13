@@ -38,7 +38,7 @@ const Register = () => {
 
     try {
       const response = await axios.post(
-        "http://localhost:5000/api/auth/register",
+        "https://blog-platform-web-gqdd.onrender.com/api/auth/register",
         formData
       );
 
@@ -62,7 +62,7 @@ const Register = () => {
       });
 
       const response = await axios.post(
-        "http://localhost:5000/api/auth/verify-otp",
+        "https://blog-platform-web-gqdd.onrender.com/api/auth/verify-otp",
         {
           email: formData.email,
           otp,
