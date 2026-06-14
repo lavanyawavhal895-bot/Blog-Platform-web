@@ -2,13 +2,22 @@ import { Request, Response } from "express";
 import User from "../models/User";
 import bcrypt from "bcryptjs";
 import jwt from "jsonwebtoken";
-import { Resend } from "resend";
+import nodemailer from "nodemailer";
+
+
 
 const JWT_SECRET = process.env.JWT_SECRET || "blogcmssecret";
-console.log("RESEND_API_KEY exists:", !!process.env.RESEND_API_KEY);
-// Initialize Resend
-const resend = new Resend(process.env.RESEND_API_KEY);
 
+
+const transporter = nodemailer.createTransport({
+  host: "smtp-relay.brevo.com",
+  port: 587,
+  secure: false,
+  auth: {
+    user: process.env.BREVO_USER,
+    pass: process.env.BREVO_PASS,
+  },
+});
 export const register = async (req: Request, res: Response) => {
   try {
     const { username, email, password } = req.body;
@@ -33,32 +42,30 @@ export const register = async (req: Request, res: Response) => {
 
     // ISOLATED EMAIL LOGIC: 
     // If this fails, the user is still created, and we log the error instead of crashing.
-    try {
+ try {
   console.log("📧 Sending OTP:", otp);
   console.log("📧 Sending to:", email);
 
-  const result = await resend.emails.send({
-    from: "onboarding@resend.dev",
-    to: [email],
-    subject: "Verify Your Blog CMS Account",
-    html: `
-      <div style="font-family: Arial, sans-serif; padding: 20px;">
-        <h2>Welcome to Blog CMS 🚀</h2>
-        <p>Your verification code is:</p>
-        <h1 style="color:#7c3aed; letter-spacing:4px;">
-          ${otp}
-        </h1>
-        <p>This code expires in 10 minutes.</p>
-      </div>
-    `,
-  });
+ await transporter.sendMail({
+  from: process.env.BREVO_USER,
+  to: email,
+  subject: "Verify Your Blog CMS Account",
+  html: `
+    <div style="font-family: Arial, sans-serif; padding: 20px;">
+      <h2>Welcome to Blog CMS 🚀</h2>
+      <p>Your verification code is:</p>
+      <h1 style="color:#7c3aed; letter-spacing:4px;">
+        ${otp}
+      </h1>
+      <p>This code expires in 10 minutes.</p>
+    </div>
+  `,
+});
 
-  console.log("📨 Resend Result:", result);
-  console.log("✅ Email sent successfully");
+console.log("✅ Email sent successfully");
 } catch (emailError) {
   console.error("❌ Email sending failed:", emailError);
 }
-
     return res.status(201).json({ 
       message: "User registered. Please verify OTP.", 
       userId: user._id 
@@ -137,18 +144,18 @@ export const forgotPassword = async (req: Request, res: Response) => {
 
     const resetLink = `${process.env.CLIENT_URL}/reset-password/${resetToken}`;
 
-    await resend.emails.send({
-      from: "onboarding@resend.dev",
-      to: email,
-      subject: "Reset Your Password",
-      html: `
-        <h2>Password Reset</h2>
-        <p>Click below link:</p>
-        <a href="${resetLink}">
-          Reset Password
-        </a>
-      `,
-    });
+    await transporter.sendMail({
+  from: process.env.BREVO_USER,
+  to: email,
+  subject: "Reset Your Password",
+  html: `
+    <h2>Password Reset</h2>
+    <p>Click below link:</p>
+    <a href="${resetLink}">
+      Reset Password
+    </a>
+  `,
+});
 
     return res.status(200).json({
       message: "Reset link sent"
