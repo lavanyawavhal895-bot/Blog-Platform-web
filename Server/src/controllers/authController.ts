@@ -34,29 +34,30 @@ export const register = async (req: Request, res: Response) => {
     // ISOLATED EMAIL LOGIC: 
     // If this fails, the user is still created, and we log the error instead of crashing.
     try {
-      console.log("📧 Sending OTP:", otp);
-      console.log("📧 Sending to:", email);
+  console.log("📧 Sending OTP:", otp);
+  console.log("📧 Sending to:", email);
 
-      await resend.emails.send({
-        from: "onboarding@resend.dev",
-        to: email,
-        subject: "Verify Your Blog CMS Account",
-        html: `
-          <div style="font-family: Arial, sans-serif; padding: 20px;">
-            <h2>Welcome to Blog CMS 🚀</h2>
-            <p>Your verification code is:</p>
-            <h1 style="color:#7c3aed; letter-spacing:4px;">
-              ${otp}
-            </h1>
-            <p>This code expires in 10 minutes.</p>
-          </div>
-        `,
-      });
+  const result = await resend.emails.send({
+    from: "onboarding@resend.dev",
+    to: [email],
+    subject: "Verify Your Blog CMS Account",
+    html: `
+      <div style="font-family: Arial, sans-serif; padding: 20px;">
+        <h2>Welcome to Blog CMS 🚀</h2>
+        <p>Your verification code is:</p>
+        <h1 style="color:#7c3aed; letter-spacing:4px;">
+          ${otp}
+        </h1>
+        <p>This code expires in 10 minutes.</p>
+      </div>
+    `,
+  });
 
-      console.log("✅ Email sent successfully");
-    } catch (emailError) {
-      console.error("❌ Email sending failed:", emailError);
-    }
+  console.log("📨 Resend Result:", result);
+  console.log("✅ Email sent successfully");
+} catch (emailError) {
+  console.error("❌ Email sending failed:", emailError);
+}
 
     return res.status(201).json({ 
       message: "User registered. Please verify OTP.", 
