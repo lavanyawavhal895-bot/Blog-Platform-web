@@ -2,36 +2,13 @@ import { Request, Response } from "express";
 import User from "../models/User";
 import bcrypt from "bcryptjs";
 import jwt from "jsonwebtoken";
-import nodemailer from "nodemailer";
+import { Resend } from "resend";
 
 const JWT_SECRET = process.env.JWT_SECRET || "blogcmssecret";
-console.log("SMTP Host:", "smtp.gmail.com");
-console.log("SMTP Port:", 465);
-console.log("SMTP Secure:", true);
+console.log("RESEND_API_KEY exists:", !!process.env.RESEND_API_KEY);
+// Initialize Resend
+const resend = new Resend(process.env.RESEND_API_KEY);
 
-console.log("EMAIL_USER:", process.env.EMAIL_USER);
-console.log("EMAIL_PASS exists:", !!process.env.EMAIL_PASS);
-// Configure Nodemailer
-const transporter = nodemailer.createTransport({
-  host: "smtp.gmail.com",
-  port: 465,
-  secure: true,
-  // Add these for better stability on Render
-  pool: true, 
-  connectionTimeout: 15000, // 15 seconds
-  socketTimeout: 30000,     // 30 seconds
-  auth: {
-    user: process.env.EMAIL_USER,
-    pass: process.env.EMAIL_PASS,
-  },
-});
-transporter.verify((error, success) => {
-  if (error) {
-    console.log("❌ Email Config Error:", error);
-  } else {
-    console.log("✅ Email Server Ready");
-  }
-});
 export const register = async (req: Request, res: Response) => {
   try {
     const { username, email, password } = req.body;
@@ -56,30 +33,30 @@ export const register = async (req: Request, res: Response) => {
 
     // ISOLATED EMAIL LOGIC: 
     // If this fails, the user is still created, and we log the error instead of crashing.
-   try {
-  console.log("📧 Sending OTP:", otp);
-  console.log("📧 Sending to:", email);
+    try {
+      console.log("📧 Sending OTP:", otp);
+      console.log("📧 Sending to:", email);
 
-  await transporter.sendMail({
-  from: `"Blog CMS" <${process.env.EMAIL_USER}>`,
-  to: email,
-  subject: "Verify Your Blog CMS Account",
-  html: `
-    <div style="font-family: Arial, sans-serif; padding: 20px;">
-      <h2>Welcome to Blog CMS 🚀</h2>
-      <p>Your verification code is:</p>
-      <h1 style="color:#7c3aed; letter-spacing:4px;">
-        ${otp}
-      </h1>
-      <p>This code expires in 10 minutes.</p>
-    </div>
-  `,
-});
+      await resend.emails.send({
+        from: "onboarding@resend.dev",
+        to: email,
+        subject: "Verify Your Blog CMS Account",
+        html: `
+          <div style="font-family: Arial, sans-serif; padding: 20px;">
+            <h2>Welcome to Blog CMS 🚀</h2>
+            <p>Your verification code is:</p>
+            <h1 style="color:#7c3aed; letter-spacing:4px;">
+              ${otp}
+            </h1>
+            <p>This code expires in 10 minutes.</p>
+          </div>
+        `,
+      });
 
-  console.log("✅ Email sent successfully");
-} catch (emailError) {
-  console.error("❌ Email sending failed:", emailError);
-}
+      console.log("✅ Email sent successfully");
+    } catch (emailError) {
+      console.error("❌ Email sending failed:", emailError);
+    }
 
     return res.status(201).json({ 
       message: "User registered. Please verify OTP.", 
@@ -91,6 +68,7 @@ export const register = async (req: Request, res: Response) => {
     return res.status(500).json({ message: "Server Error" });
   }
 };
+
 // Verify OTP
 export const verifyOTP = async (req: Request, res: Response) => {
   try {
@@ -137,6 +115,7 @@ export const login = async (req: Request, res: Response) => {
     return res.status(500).json({ message: "Server Error" });
   }
 };
+
 export const forgotPassword = async (req: Request, res: Response) => {
   try {
     const { email } = req.body;
@@ -155,11 +134,10 @@ export const forgotPassword = async (req: Request, res: Response) => {
       { expiresIn: "15m" }
     );
 
-   const resetLink =
-  `${process.env.CLIENT_URL}/reset-password/${resetToken}`;
+    const resetLink = `${process.env.CLIENT_URL}/reset-password/${resetToken}`;
 
-    await transporter.sendMail({
-      from: `"Blog CMS" <${process.env.EMAIL_USER}>`,
+    await resend.emails.send({
+      from: "onboarding@resend.dev",
       to: email,
       subject: "Reset Your Password",
       html: `
@@ -183,6 +161,7 @@ export const forgotPassword = async (req: Request, res: Response) => {
     });
   }
 };
+
 export const resetPassword = async (req: Request, res: Response) => {
   try {
     const { token, password } = req.body;
