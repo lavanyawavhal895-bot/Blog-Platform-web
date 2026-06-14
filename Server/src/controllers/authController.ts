@@ -5,7 +5,9 @@ import jwt from "jsonwebtoken";
 import nodemailer from "nodemailer";
 
 const JWT_SECRET = process.env.JWT_SECRET || "blogcmssecret";
-
+console.log("SMTP Host:", "smtp.gmail.com");
+console.log("SMTP Port:", 465);
+console.log("SMTP Secure:", true);
 // Configure Nodemailer
 const transporter = nodemailer.createTransport({
   host: "smtp.gmail.com",
