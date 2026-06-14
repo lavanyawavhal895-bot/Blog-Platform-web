@@ -8,6 +8,9 @@ const JWT_SECRET = process.env.JWT_SECRET || "blogcmssecret";
 console.log("SMTP Host:", "smtp.gmail.com");
 console.log("SMTP Port:", 465);
 console.log("SMTP Secure:", true);
+
+console.log("EMAIL_USER:", process.env.EMAIL_USER);
+console.log("EMAIL_PASS exists:", !!process.env.EMAIL_PASS);
 // Configure Nodemailer
 const transporter = nodemailer.createTransport({
   host: "smtp.gmail.com",
