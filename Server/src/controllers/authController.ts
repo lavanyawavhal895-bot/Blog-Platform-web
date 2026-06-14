@@ -2,35 +2,19 @@ import { Request, Response } from "express";
 import User from "../models/User";
 import bcrypt from "bcryptjs";
 import jwt from "jsonwebtoken";
-import nodemailer from "nodemailer";
-
+// @ts-ignore
+import SibApiV3Sdk from "sib-api-v3-sdk";
 
 
 const JWT_SECRET = process.env.JWT_SECRET || "blogcmssecret";
+const defaultClient = SibApiV3Sdk.ApiClient.instance;
 
-console.log("BREVO_USER:", process.env.BREVO_USER);
-console.log("BREVO_PASS exists:", !!process.env.BREVO_PASS);
+const apiKey = defaultClient.authentications["api-key"];
+apiKey.apiKey = process.env.BREVO_API_KEY || "";
+
+const emailApi = new SibApiV3Sdk.TransactionalEmailsApi();
 
 
-const transporter = nodemailer.createTransport({
-  host: "smtp-relay.brevo.com",
-  port: 587,
-  secure: false,
-  auth: {
-    user: process.env.BREVO_USER,
-    pass: process.env.BREVO_PASS,
-  },
-  connectionTimeout: 10000,
-  greetingTimeout: 10000,
-  socketTimeout: 10000,
-});
-transporter.verify((error, success) => {
-  if (error) {
-    console.log("❌ SMTP Error:", error);
-  } else {
-    console.log("✅ SMTP Ready");
-  }
-});
 export const register = async (req: Request, res: Response) => {
   try {
     const { username, email, password } = req.body;
@@ -59,11 +43,18 @@ export const register = async (req: Request, res: Response) => {
   console.log("📧 Sending OTP:", otp);
   console.log("📧 Sending to:", email);
 
- await transporter.sendMail({
-  from: process.env.BREVO_USER,
-  to: email,
+await emailApi.sendTransacEmail({
+  sender: {
+    name: "Blog CMS",
+    email: "lavanyawavhal895@gmail.com",
+  },
+  to: [
+    {
+      email: email,
+    },
+  ],
   subject: "Verify Your Blog CMS Account",
-  html: `
+  htmlContent: `
     <div style="font-family: Arial, sans-serif; padding: 20px;">
       <h2>Welcome to Blog CMS 🚀</h2>
       <p>Your verification code is:</p>
@@ -157,11 +148,18 @@ export const forgotPassword = async (req: Request, res: Response) => {
 
     const resetLink = `${process.env.CLIENT_URL}/reset-password/${resetToken}`;
 
-    await transporter.sendMail({
-  from: process.env.BREVO_USER,
-  to: email,
+    await emailApi.sendTransacEmail({
+  sender: {
+    name: "Blog CMS",
+    email: "lavanyawavhal895@gmail.com",
+  },
+  to: [
+    {
+      email: email,
+    },
+  ],
   subject: "Reset Your Password",
-  html: `
+  htmlContent: `
     <h2>Password Reset</h2>
     <p>Click below link:</p>
     <a href="${resetLink}">
