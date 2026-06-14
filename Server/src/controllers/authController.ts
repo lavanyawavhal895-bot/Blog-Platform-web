@@ -7,6 +7,9 @@ import nodemailer from "nodemailer";
 const JWT_SECRET = process.env.JWT_SECRET || "blogcmssecret";
 
 // Configure Nodemailer
+console.log("EMAIL_SERVICE:", process.env.EMAIL_SERVICE);
+console.log("EMAIL_USER:", process.env.EMAIL_USER);
+console.log("EMAIL_PASS exists:", !!process.env.EMAIL_PASS);
 const transporter = nodemailer.createTransport({
   service: process.env.EMAIL_SERVICE,
   auth: {
@@ -144,8 +147,8 @@ export const forgotPassword = async (req: Request, res: Response) => {
       { expiresIn: "15m" }
     );
 
-    const resetLink =
-      `http://localhost:5173/reset-password/${resetToken}`;
+   const resetLink =
+  `${process.env.CLIENT_URL}/reset-password/${resetToken}`;
 
     await transporter.sendMail({
       from: `"Blog CMS" <${process.env.EMAIL_USER}>`,
