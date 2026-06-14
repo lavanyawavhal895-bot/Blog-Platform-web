@@ -8,6 +8,10 @@ import nodemailer from "nodemailer";
 
 const JWT_SECRET = process.env.JWT_SECRET || "blogcmssecret";
 
+console.log("BREVO_USER:", process.env.BREVO_USER);
+console.log("BREVO_PASS exists:", !!process.env.BREVO_PASS);
+
+
 
 const transporter = nodemailer.createTransport({
   host: "smtp-relay.brevo.com",
@@ -17,6 +21,13 @@ const transporter = nodemailer.createTransport({
     user: process.env.BREVO_USER,
     pass: process.env.BREVO_PASS,
   },
+});
+transporter.verify((error, success) => {
+  if (error) {
+    console.log("❌ SMTP Error:", error);
+  } else {
+    console.log("✅ SMTP Ready");
+  }
 });
 export const register = async (req: Request, res: Response) => {
   try {
