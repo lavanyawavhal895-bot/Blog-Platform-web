@@ -7,13 +7,14 @@ import nodemailer from "nodemailer";
 const JWT_SECRET = process.env.JWT_SECRET || "blogcmssecret";
 
 // Configure Nodemailer
-console.log("EMAIL_SERVICE:", process.env.EMAIL_SERVICE);
-console.log("EMAIL_USER:", process.env.EMAIL_USER);
-console.log("EMAIL_PASS exists:", !!process.env.EMAIL_PASS);
 const transporter = nodemailer.createTransport({
   host: "smtp.gmail.com",
   port: 465,
   secure: true,
+  // Add these for better stability on Render
+  pool: true, 
+  connectionTimeout: 15000, // 15 seconds
+  socketTimeout: 30000,     // 30 seconds
   auth: {
     user: process.env.EMAIL_USER,
     pass: process.env.EMAIL_PASS,
