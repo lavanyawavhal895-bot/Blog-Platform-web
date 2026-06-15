@@ -1,7 +1,6 @@
 import { BrowserRouter, useLocation } from "react-router-dom";
 import AppRoutes from "./routes/AppRoutes";
 import Navbar from "./components/Navbar";
-import { AuthProvider } from "./context/AuthContext";
 
 const AppContent = () => {
   const location = useLocation();
