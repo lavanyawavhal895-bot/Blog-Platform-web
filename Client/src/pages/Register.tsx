@@ -3,6 +3,7 @@ import axios from "axios";
 import { useNavigate } from "react-router-dom";
 import ShaderBackground from "../components/ui/ShaderBackground";
 import { Eye, EyeOff } from "lucide-react";
+import { Link } from "react-router-dom";
 
 const Register = () => {
   const navigate = useNavigate();
@@ -148,6 +149,14 @@ const Register = () => {
             >
               Register
             </button>
+            <div className="mt-6 text-center">
+            <Link
+              to="/login"
+              className="text-sm text-slate-400 hover:text-white transition-colors"
+            >
+              ← Back to Login
+            </Link>
+</div>
           </form>
         ) : (
           <form onSubmit={handleVerify} className="space-y-4">
