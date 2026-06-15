@@ -29,7 +29,7 @@ const Navbar = () => {
       >
         <div className="max-w-7xl mx-auto flex justify-between items-center">
           {/* Logo */}
-          <Link to="/Dashboard" className="flex items-center gap-3 group">
+          <Link to="/dashboard" className="flex items-center gap-3 group">
             <div
               className="w-11 h-11 rounded-2xl flex items-center justify-center text-white font-bold text-lg transition-all duration-300"
               style={{
@@ -58,7 +58,7 @@ const Navbar = () => {
           {/* Desktop Links */}
           <div className="hidden md:flex items-center gap-8">
             <Link
-              to="/Dashboard"
+              to="/dashboard"
               className="text-white/70 hover:text-white transition-all duration-300"
             >
               Dashboard
@@ -193,7 +193,7 @@ const Navbar = () => {
           >
             <div className="flex flex-col gap-4">
               <Link
-                to="/Dashboard"
+                to="/dashboard"
                 onClick={() => setIsOpen(false)}
                 className="text-white/70 hover:text-white py-1"
               >

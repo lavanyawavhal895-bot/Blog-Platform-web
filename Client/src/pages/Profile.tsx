@@ -1,15 +1,21 @@
-import { useEffect } from "react";
+import { useAuth } from "../context/AuthContext";
 
 const Profile = () => {
-  useEffect(() => {
-    console.log("PROFILE PAGE LOADED");
-  }, []);
+  const { user, token, loading } = useAuth();
 
   return (
-    <div className="min-h-screen flex items-center justify-center text-white">
-      <h1 className="text-4xl font-bold">
-        My Profile
-      </h1>
+    <div className="min-h-screen p-10 text-white">
+      <pre>
+        {JSON.stringify(
+          {
+            loading,
+            token,
+            user,
+          },
+          null,
+          2
+        )}
+      </pre>
     </div>
   );
 };
