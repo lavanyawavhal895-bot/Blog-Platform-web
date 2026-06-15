@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import { useNavigate } from "react-router-dom"; // Added for re-login navigation
 import { 
   Camera, 
   Image as ImageIcon, 
@@ -31,6 +32,7 @@ const TwitterIcon = () => (
 );
 
 const Profile = () => {
+  const navigate = useNavigate();
   const [profile, setProfile] = useState<any>(null);
   const [loading, setLoading] = useState(true);
   const [isEditing, setIsEditing] = useState(false);
@@ -76,6 +78,64 @@ const Profile = () => {
     fetchProfile();
   }, []);
 
+  // Handle Profile Image Upload with Size Validation
+  const handleProfileImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    if (file.size > 5 * 1024 * 1024) {
+      alert("Image must be under 5MB");
+      return;
+    }
+
+    try {
+      const formData = new FormData();
+      formData.append("image", file);
+
+      const uploadRes = await apiClient.post("/upload/image", formData);
+      const imageUrl = uploadRes.data.imageUrl;
+
+      await apiClient.put("/profile", {
+        profileImage: imageUrl,
+      });
+
+      fetchProfile();
+      alert("Profile image updated! 👤");
+    } catch (error) {
+      console.error(error);
+      alert("Profile image upload failed");
+    }
+  };
+
+  // Handle Cover Image Upload with Size Validation
+  const handleCoverImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    if (file.size > 5 * 1024 * 1024) {
+      alert("Image must be under 5MB");
+      return;
+    }
+
+    try {
+      const formData = new FormData();
+      formData.append("image", file);
+
+      const uploadRes = await apiClient.post("/upload/image", formData);
+      const imageUrl = uploadRes.data.imageUrl;
+
+      await apiClient.put("/profile", {
+        coverImage: imageUrl,
+      });
+
+      fetchProfile();
+      alert("Cover image updated! 🖼️");
+    } catch (error) {
+      console.error(error);
+      alert("Cover image upload failed");
+    }
+  };
+
   // Password Strength Check Logic
   const getPasswordStrength = (pwd: string) => {
     if (!pwd) return { label: "", color: "text-slate-400" };
@@ -92,9 +152,17 @@ const Profile = () => {
 
   const passwordStrength = getPasswordStrength(newPassword);
 
-  // Handle Profile Update Save
+  // Handle Profile Update Save with URL Validation Check
   const handleSaveProfile = async (e: React.FormEvent) => {
     e.preventDefault();
+
+    // URL Validation Guard for Social Links
+    if (github && !github.startsWith("http")) return alert("GitHub URL invalid. Must start with http:// or https://");
+    if (linkedin && !linkedin.startsWith("http")) return alert("LinkedIn URL invalid. Must start with http:// or https://");
+    if (portfolio && !portfolio.startsWith("http")) return alert("Portfolio URL invalid. Must start with http:// or https://");
+    if (twitter && !twitter.startsWith("http")) return alert("Twitter/X URL invalid. Must start with http:// or https://");
+    if (instagram && !instagram.startsWith("http")) return alert("Instagram URL invalid. Must start with http:// or https://");
+
     try {
       await apiClient.put("/profile", {
         username,
@@ -115,9 +183,20 @@ const Profile = () => {
     }
   };
 
-  // Handle Password Change
+  // Handle Password Change with Automatic Re-login Flow
   const handlePasswordUpdate = async (e: React.FormEvent) => {
     e.preventDefault();
+
+    if (newPassword.length < 8) {
+      setPasswordMessage("❌ New password must be at least 8 characters!");
+      return;
+    }
+
+    if (currentPassword === newPassword) {
+      setPasswordMessage("❌ New password must be different from current password!");
+      return;
+    }
+
     if (newPassword !== confirmPassword) {
       setPasswordMessage("❌ New passwords do not match!");
       return;
@@ -128,10 +207,13 @@ const Profile = () => {
         currentPassword,
         newPassword,
       });
-      setPasswordMessage("✅ Password updated successfully!");
-      setCurrentPassword("");
-      setNewPassword("");
-      setConfirmPassword("");
+      
+      setPasswordMessage("✅ Password updated successfully! Logging out...");
+      alert("Password changed successfully. Please login again with your new credentials! 🔐");
+      
+      // Clear token and force re-login for security best practice
+      localStorage.removeItem("token");
+      navigate("/login");
     } catch (error: any) {
       setPasswordMessage(error.response?.data?.message || "❌ Failed to change password");
     }
@@ -150,6 +232,22 @@ const Profile = () => {
     <div className="relative min-h-screen w-full p-4 md:p-8 flex justify-center items-start overflow-y-auto">
       <ShaderBackground />
 
+      {/* Hidden File Inputs for Upload */}
+      <input
+        type="file"
+        accept="image/*"
+        id="profileImageInput"
+        className="hidden"
+        onChange={handleProfileImageUpload}
+      />
+      <input
+        type="file"
+        accept="image/*"
+        id="coverImageInput"
+        className="hidden"
+        onChange={handleCoverImageUpload}
+      />
+
       <div className="relative w-full max-w-5xl space-y-8 my-6">
         
         {/* SECTION 1: COVER BANNER & PROFILE HEADER */}
@@ -160,21 +258,29 @@ const Profile = () => {
             ) : (
               <div className="text-white/30 text-sm tracking-widest uppercase">No Cover Banner Uploaded</div>
             )}
-            <button className="absolute top-4 right-4 bg-black/40 hover:bg-black/60 p-3 rounded-full text-white transition-colors">
+            <button 
+              type="button"
+              onClick={() => document.getElementById("coverImageInput")?.click()}
+              className="absolute top-4 right-4 bg-black/40 hover:bg-black/60 p-3 rounded-full text-white transition-colors"
+            >
               <ImageIcon size={18} />
             </button>
           </div>
 
           <div className="p-6 pt-0 flex flex-col md:flex-row items-center md:items-end gap-6 -mt-16 relative z-10">
             <div className="relative">
-              <div className="w-32 h-32 rounded-full bg-gradient-to-tr from-purple-500 to-pink-500 border-4 border-white/20 flex items-center justify-center text-5xl font-bold text-white shadow-lg overflow-hidden">
+              <div className="w-32 h-32 rounded-full bg-gradient-to-tr from-purple-500 to-pink-500 border-4 border-slate-950 flex items-center justify-center text-5xl font-bold text-white shadow-lg overflow-hidden">
                 {profile?.profileImage ? (
                   <img src={profile.profileImage} alt="Avatar" className="w-full h-full object-cover" />
                 ) : (
                   profile?.username?.charAt(0)?.toUpperCase()
                 )}
               </div>
-              <button className="absolute bottom-0 right-0 bg-purple-600 hover:bg-purple-700 p-2.5 rounded-full text-white border border-white/10 shadow-md transition-colors">
+              <button
+                type="button"
+                onClick={() => document.getElementById("profileImageInput")?.click()}
+                className="absolute bottom-0 right-0 bg-purple-600 hover:bg-purple-700 p-2.5 rounded-full text-white border border-white/10 shadow-md transition-colors"
+              >
                 <Camera size={16} />
               </button>
             </div>
@@ -268,32 +374,36 @@ const Profile = () => {
               <div className="p-6 md:p-8 rounded-3xl backdrop-blur-xl bg-white/10 border border-white/20 shadow-xl text-white space-y-4">
                 <h3 className="text-xl font-bold">Connect with Me</h3>
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                  {github && (
-                    <a href={github} target="_blank" rel="noreferrer" className="flex items-center gap-3 p-3 bg-white/5 rounded-xl border border-white/5 hover:bg-white/10 transition-colors">
+                  {profile?.socialLinks?.github && (
+                    <a href={profile.socialLinks.github} target="_blank" rel="noreferrer" className="flex items-center gap-3 p-3 bg-white/5 rounded-xl border border-white/5 hover:bg-white/10 transition-colors">
                       <GithubIcon /> <span className="text-xs truncate">GitHub</span>
                     </a>
                   )}
-                  {linkedin && (
-                    <a href={linkedin} target="_blank" rel="noreferrer" className="flex items-center gap-3 p-3 bg-white/5 rounded-xl border border-white/5 hover:bg-white/10 transition-colors">
+                  {profile?.socialLinks?.linkedin && (
+                    <a href={profile.socialLinks.linkedin} target="_blank" rel="noreferrer" className="flex items-center gap-3 p-3 bg-white/5 rounded-xl border border-white/5 hover:bg-white/10 transition-colors">
                       <LinkedinIcon /> <span className="text-xs truncate">LinkedIn</span>
                     </a>
                   )}
-                  {portfolio && (
-                    <a href={portfolio} target="_blank" rel="noreferrer" className="flex items-center gap-3 p-3 bg-white/5 rounded-xl border border-white/5 hover:bg-white/10 transition-colors">
+                  {profile?.socialLinks?.portfolio && (
+                    <a href={profile.socialLinks.portfolio} target="_blank" rel="noreferrer" className="flex items-center gap-3 p-3 bg-white/5 rounded-xl border border-white/5 hover:bg-white/10 transition-colors">
                       <Globe size={18} className="text-emerald-400" /> <span className="text-xs truncate">Portfolio</span>
                     </a>
                   )}
-                  {twitter && (
-                    <a href={twitter} target="_blank" rel="noreferrer" className="flex items-center gap-3 p-3 bg-white/5 rounded-xl border border-white/5 hover:bg-white/10 transition-colors">
+                  {profile?.socialLinks?.twitter && (
+                    <a href={profile.socialLinks.twitter} target="_blank" rel="noreferrer" className="flex items-center gap-3 p-3 bg-white/5 rounded-xl border border-white/5 hover:bg-white/10 transition-colors">
                       <TwitterIcon /> <span className="text-xs truncate">Twitter / X</span>
                     </a>
                   )}
-                  {instagram && (
-                    <a href={instagram} target="_blank" rel="noreferrer" className="flex items-center gap-3 p-3 bg-white/5 rounded-xl border border-white/5 hover:bg-white/10 transition-colors">
+                  {profile?.socialLinks?.instagram && (
+                    <a href={profile.socialLinks.instagram} target="_blank" rel="noreferrer" className="flex items-center gap-3 p-3 bg-white/5 rounded-xl border border-white/5 hover:bg-white/10 transition-colors">
                       <InstagramIcon /> <span className="text-xs truncate">Instagram</span>
                     </a>
                   )}
-                  {!github && !linkedin && !portfolio && !twitter && !instagram && (
+                  {!profile?.socialLinks?.github && 
+                   !profile?.socialLinks?.linkedin && 
+                   !profile?.socialLinks?.portfolio && 
+                   !profile?.socialLinks?.twitter && 
+                   !profile?.socialLinks?.instagram && (
                     <p className="text-slate-400 text-sm">No social media profiles added yet.</p>
                   )}
                 </div>
