@@ -1,5 +1,6 @@
 import { Request, Response } from "express";
 import User from "../models/User";
+import bcrypt from "bcryptjs";
 
 // ==========================
 // GET LOGGED-IN USER PROFILE
@@ -25,7 +26,49 @@ export const getProfile = async (req: any, res: Response) => {
     });
   }
 };
+export const changePassword = async (req: any, res: Response) => {
+  try {
+    const { currentPassword, newPassword } = req.body;
 
+    const user = await User.findById(req.user.id);
+
+    if (!user) {
+      return res.status(404).json({
+        message: "User not found",
+      });
+    }
+
+    const isMatch = await bcrypt.compare(
+      currentPassword,
+      user.password
+    );
+
+    if (!isMatch) {
+      return res.status(400).json({
+        message: "Current password is incorrect",
+      });
+    }
+
+    const hashedPassword = await bcrypt.hash(
+      newPassword,
+      10
+    );
+
+    user.password = hashedPassword;
+
+    await user.save();
+
+    return res.status(200).json({
+      message: "Password updated successfully",
+    });
+  } catch (error) {
+    console.error(error);
+
+    return res.status(500).json({
+      message: "Server Error",
+    });
+  }
+};
 // ==========================
 // UPDATE PROFILE
 // ==========================

@@ -3,6 +3,7 @@ import {
   getProfile,
   updateProfile,
   getPublicProfile,
+  changePassword,
 } from "../controllers/profileController";
 
 import { protect } from "../middleware/authMiddleware";
@@ -17,5 +18,11 @@ router.put("/", protect, updateProfile);
 
 // Public profile (for viewing blog author profiles)
 router.get("/user/:id", getPublicProfile);
+   router.put(
+  "/change-password",
+  protect,
+  changePassword
+); 
+
 
 export default router;
