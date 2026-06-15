@@ -9,7 +9,7 @@ const AppContent = () => {
     location.pathname === "/login" ||
     location.pathname === "/register" ||
     location.pathname === "/forgot-password";
-
+    location.pathname.startsWith("/reset-password");
   return (
     <div className="min-h-screen">
       {!hideNavbar && <Navbar />}
