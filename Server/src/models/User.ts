@@ -30,13 +30,61 @@ const userSchema = new mongoose.Schema(
       type: String,
       default: null,
     },
+
     otpExpiry: {
       type: Date,
       default: null,
     },
+
     isVerified: {
       type: Boolean,
       default: false,
+    },
+
+    // =========================
+    // PROFILE FIELDS
+    // =========================
+
+    profileImage: {
+      type: String,
+      default: "",
+    },
+
+    coverImage: {
+      type: String,
+      default: "",
+    },
+
+    bio: {
+      type: String,
+      default: "",
+    },
+
+    socialLinks: {
+      github: {
+        type: String,
+        default: "",
+      },
+
+      linkedin: {
+        type: String,
+        default: "",
+      },
+
+      portfolio: {
+        type: String,
+        default: "",
+      },
+
+      twitter: {
+        type: String,
+        default: "",
+      },
+
+      instagram: {
+        type: String,
+        default: "",
+      },
     },
   },
   {

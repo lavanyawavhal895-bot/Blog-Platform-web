@@ -11,6 +11,7 @@ import authRoutes from "./routes/authRoutes";
 import blogRoutes from "./routes/blogRoutes";
 import uploadRoutes from "./routes/uploadRoutes";
 import adminRoutes from "./routes/adminRoutes";
+import profileRoutes from "./routes/profileRoutes";
 
 // Initialize Express Framework
 const app = express();
@@ -27,7 +28,7 @@ app.use("/api/auth", authRoutes);
 app.use("/api/blogs", blogRoutes);
 app.use("/api/upload", uploadRoutes);
 app.use("/api/admin", adminRoutes); // Secured admin endpoints layer fully operational
-
+app.use("/api/profile", profileRoutes);
 // Base Health Check Route
 app.get("/", (req: Request, res: Response) => {
   res.send("Blog CMS API Running 🚀");
