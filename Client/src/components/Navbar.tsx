@@ -70,7 +70,12 @@ const Navbar = () => {
             >
               My Blogs
             </Link>
-
+            <Link
+              to="/profile"
+              className="text-white/70 hover:text-white transition-all duration-300"
+            >
+              Profile
+            </Link>
             {/* Admin Dashboard Conditional Route Node */}
             {user?.role === "admin" && (
               <Link
@@ -117,26 +122,23 @@ const Navbar = () => {
             </Link>
           </div>
 
-          {/* Right Section */}
-          <div className="flex items-center gap-3">
-            {/* Avatar showing role context subheader info on hovering or layout tracking */}
-            <div
-              title={`Logged in as ${user?.username} (${user?.role || "user"})`}
-              className="w-10 h-10 rounded-full flex items-center justify-center text-white font-bold text-sm uppercase select-none"
-              style={{
-                background:
-                  user?.role === "admin"
-                    ? "linear-gradient(135deg, #ff006e, #8338ec)"
-                    : "linear-gradient(135deg,#00d4ff,#3a86ff)",
-                boxShadow:
-                  user?.role === "admin"
-                    ? "0 0 18px rgba(255,0,110,.5)"
-                    : "0 0 18px rgba(58,134,255,.5)",
-              }}
-            >
-              {user?.username?.charAt(0)?.toUpperCase() || "U"}
-            </div>
-
+        <Link
+                to="/profile"
+                title={`Logged in as ${user?.username} (${user?.role || "user"})`}
+                className="w-10 h-10 rounded-full flex items-center justify-center text-white font-bold text-sm uppercase select-none"
+                style={{
+                  background:
+                    user?.role === "admin"
+                      ? "linear-gradient(135deg, #ff006e, #8338ec)"
+                      : "linear-gradient(135deg,#00d4ff,#3a86ff)",
+                  boxShadow:
+                    user?.role === "admin"
+                      ? "0 0 18px rgba(255,0,110,.5)"
+                      : "0 0 18px rgba(58,134,255,.5)",
+                }}
+              >
+                {user?.username?.charAt(0)?.toUpperCase() || "U"}
+              </Link>
             {/* Logout */}
             <button
               onClick={handleLogout}
@@ -178,8 +180,7 @@ const Navbar = () => {
               </svg>
             </button>
           </div>
-        </div>
-
+        
         {/* Mobile Menu */}
         {isOpen && (
           <div
@@ -206,7 +207,13 @@ const Navbar = () => {
               >
                 My Blogs
               </Link>
-
+              <Link
+                to="/profile"
+                onClick={() => setIsOpen(false)}
+                className="text-white/70 hover:text-white py-1"
+              >
+                Profile
+              </Link>
               {/* Mobile View Admin Link */}
               {user?.role === "admin" && (
                 <Link
