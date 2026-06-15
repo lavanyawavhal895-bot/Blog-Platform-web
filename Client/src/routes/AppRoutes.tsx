@@ -9,6 +9,7 @@ import CreateBlog from "../pages/CreateBlog";
 import MyBlogs from "../pages/MyBlogs";
 import BlogDetails from "../pages/BlogDetails";
 import EditBlog from "../pages/EditBlog";
+import ResetPassword from "../pages/ResetPassword";
 
 import ProtectedRoute from "../components/ProtectedRoute";
 
@@ -19,7 +20,7 @@ const AppRoutes = () => {
       <Route path="/login" element={<Login />} />
       <Route path="/register" element={<Register />} />
       <Route path="/forgot-password" element={<ForgotPassword />} />
-
+      <Route path="/reset-password/:token" element={<ResetPassword />} />
       {/* User Routes */}
       <Route element={<ProtectedRoute />}>
         <Route path="/" element={<Navigate to="/dashboard" replace />} />
