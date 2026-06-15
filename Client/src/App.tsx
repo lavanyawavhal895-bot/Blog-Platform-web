@@ -23,11 +23,11 @@ const AppContent = () => {
 
 function App() {
   return (
-    <AuthProvider>
+   
       <BrowserRouter>
         <AppContent />
       </BrowserRouter>
-    </AuthProvider>
+    
   );
 }
 
