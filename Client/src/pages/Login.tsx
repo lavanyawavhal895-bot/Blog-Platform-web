@@ -25,7 +25,7 @@ const Login = () => {
         formData
       );
 
-      console.log("Login Response:", res.data);
+    
 
       login(res.data.user, res.data.token);
 
