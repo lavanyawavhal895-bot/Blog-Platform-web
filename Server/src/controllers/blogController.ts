@@ -77,7 +77,27 @@ export const getMyBlogs = async (req: Request, res: Response) => {
     });
   }
 };
+// Get Blogs By Author
+export const getBlogsByAuthor = async (
+  req: Request,
+  res: Response
+) => {
+  try {
+    const blogs = await Blog.find({
+      author: req.params.authorId,
+    })
+      .populate("author", "username")
+      .sort({ createdAt: -1 });
 
+    res.status(200).json(blogs);
+  } catch (error) {
+    console.log("Get Author Blogs Error:", error);
+
+    res.status(500).json({
+      message: "Server Error",
+    });
+  }
+};
 // Get Single Blog By ID
 export const getBlogById = async (req: Request, res: Response) => {
   try {
@@ -172,3 +192,4 @@ export const deleteBlog = async (req: AuthenticatedRequest, res: Response) => {
     });
   }
 };
+
