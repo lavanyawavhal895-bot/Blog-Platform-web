@@ -50,7 +50,7 @@ if (!blog) {
 }
 
 const currentUser = JSON.parse(
-  localStorage.getItem("user") || "{}"
+  sessionStorage.getItem("user") || "{}"
 );
 
 const isOwner =

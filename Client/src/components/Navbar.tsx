@@ -6,12 +6,12 @@ const Navbar = () => {
 
   const user =
     typeof window !== "undefined"
-      ? JSON.parse(localStorage.getItem("user") || "{}")
+      ? JSON.parse(sessionStorage.getItem("user") || "{}")
       : {};
 
   const handleLogout = () => {
-    localStorage.removeItem("user");
-    localStorage.removeItem("token");
+    sessionStorage.removeItem("user");
+    sessionStorage.removeItem("token");
     window.location.href = "/login";
   };
 
@@ -122,7 +122,7 @@ const Navbar = () => {
             </Link>
           </div>
 
-        <Link
+              <Link
                 to="/profile"
                 title={`Logged in as ${user?.username} (${user?.role || "user"})`}
                 className="w-10 h-10 rounded-full flex items-center justify-center text-white font-bold text-sm uppercase select-none"

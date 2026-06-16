@@ -162,7 +162,7 @@ const MyBlogs = () => {
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
   const dropdownRef = useRef<HTMLDivElement>(null);
 
-  const user = JSON.parse(localStorage.getItem("user") || "{}");
+  const user = JSON.parse(sessionStorage.getItem("user") || "{}");
   const colorPalettes = [
     "255, 0, 110",
     "131, 56, 236",
@@ -199,7 +199,7 @@ useEffect(() => {
 
  const fetchBlogs = async () => {
   try {
-    const token = localStorage.getItem("token");
+    const token = sessionStorage.getItem("token");
 
     const res = await axios.get(
       `https://blog-platform-web-gqdd.onrender.com/api/blogs/user/${user.id}`,
@@ -219,7 +219,7 @@ useEffect(() => {
   if (!window.confirm("Are you sure you want to delete this blog?")) return;
 
   try {
-    const token = localStorage.getItem("token");
+    const token = sessionStorage.getItem("token");
 
     await axios.delete(
       `https://blog-platform-web-gqdd.onrender.com/api/blogs/${id}`,

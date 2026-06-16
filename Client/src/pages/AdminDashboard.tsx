@@ -60,7 +60,7 @@ interface ModalConfig {
 }
 
 const AdminDashboard = () => {
-  // Use the context instead of direct localStorage access
+  // Use the context instead of direct sessionStorage access
   const { user, token } = useAuth();
   const navigate = useNavigate();
 

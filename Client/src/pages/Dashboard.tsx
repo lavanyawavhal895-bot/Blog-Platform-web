@@ -144,7 +144,7 @@ const Dashboard = () => {
   const [search, setSearch] = useState("")
   const [sortBy, setSortBy] = useState("newest")
 
-  const user = JSON.parse(typeof window !== "undefined" ? localStorage.getItem("user") || "{}" : "{}")
+  const user = JSON.parse(typeof window !== "undefined" ? sessionStorage.getItem("user") || "{}" : "{}")
 
   const colorPalettes = [
     "255, 0, 110",

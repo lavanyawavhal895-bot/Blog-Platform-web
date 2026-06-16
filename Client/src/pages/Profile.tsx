@@ -212,7 +212,7 @@ const Profile = () => {
       alert("Password changed successfully. Please login again with your new credentials! 🔐");
       
       // Clear token and force re-login for security best practice
-      localStorage.removeItem("token");
+      sessionStorage.removeItem("token");
       navigate("/login");
     } catch (error: any) {
       setPasswordMessage(error.response?.data?.message || "❌ Failed to change password");
