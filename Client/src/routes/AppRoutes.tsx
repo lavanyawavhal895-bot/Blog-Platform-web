@@ -12,6 +12,8 @@ import MyBlogs from "../pages/MyBlogs";
 import BlogDetails from "../pages/BlogDetails";
 import EditBlog from "../pages/EditBlog";
 import Profile from "../pages/Profile"; // NEW
+import AuthorProfile from "../pages/AuthorProfile";
+
 
 import ProtectedRoute from "../components/ProtectedRoute";
 
@@ -39,6 +41,7 @@ const AppRoutes = () => {
         <Route path="/create-blog" element={<CreateBlog />} />
         <Route path="/my-blogs" element={<MyBlogs />} />
         <Route path="/blog/:id" element={<BlogDetails />} />
+        <Route path="/author/:id" element={<AuthorProfile />} />
         <Route path="/edit-blog/:id" element={<EditBlog />} />
       </Route>
 

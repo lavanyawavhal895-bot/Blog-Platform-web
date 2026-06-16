@@ -48,6 +48,7 @@ if (!blog) {
     </div>
   );
 }
+
 const currentUser = JSON.parse(
   localStorage.getItem("user") || "{}"
 );
@@ -112,7 +113,13 @@ const isOwner =
             <div className="flex flex-wrap items-center gap-4 mt-8 text-sm text-slate-400">
 
               <span>
-                👤 {blog.author?.username || "Anonymous"}
+                👤{" "}
+                        <Link
+                          to={`/author/${blog.author?._id}`}
+                          className="text-cyan-400 hover:text-cyan-300"
+                        >
+                          {blog.author?.username || "Anonymous"}
+                        </Link>
               </span>
 
               <span>
@@ -193,9 +200,14 @@ const isOwner =
                 </div>
 
                 <div>
-                  <p className="font-semibold">
-                    {blog.author?.username || "Anonymous"}
-                  </p>
+                 <p className="font-semibold">
+                          <Link
+                            to={`/author/${blog.author?._id}`}
+                            className="hover:text-cyan-400"
+                          >
+                            {blog.author?.username || "Anonymous"}
+                          </Link>
+                        </p>
 
                   <p className="text-sm text-slate-400">
                     Blog Author
